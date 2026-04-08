@@ -5,8 +5,13 @@ const withBundleAnalyzer = bundleAnalyzer({
 });
 
 export default withBundleAnalyzer({
+  devIndicators: false,
   reactStrictMode: false,
   experimental: {
     optimizePackageImports: ['@mantine/core', '@mantine/hooks'],
+    useCache: true,
+  },
+  output: 'standalone',
+  env: {
   },
 });

@@ -1,0 +1,12 @@
+*
+!docker/
+!app/
+!components/
+!public/
+!src/
+!jest.*.cjs
+!next.config.mjs
+!package*.json
+!postcss.config.cjs
+!tsconfig*.json
+!*.ts

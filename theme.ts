@@ -1,7 +1,17 @@
-'use client';
+'use client'
 
-import { createTheme } from '@mantine/core';
+import { createTheme, Table } from '@mantine/core'
 
 export const theme = createTheme({
   /* Put your mantine theme override here */
-});
+
+  fontFamily: 'monospace',
+
+  components: {
+    Table: Table.extend({
+      defaultProps: {
+        highlightOnHoverColor: '#5562ea88',
+      },
+    }),
+  },
+})
