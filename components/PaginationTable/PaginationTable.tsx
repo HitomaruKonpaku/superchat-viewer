@@ -200,7 +200,7 @@ export default function PaginationTable(props: IProps) {
         {
           props.search &&
           <form onSubmit={searchForm.onSubmit(onSearch)} style={{ flex: 1 }}>
-            <Grid gutter="xs">
+            <Grid gap="xs">
               <Grid.Col span={9}>
                 <Input
                   type="search"
