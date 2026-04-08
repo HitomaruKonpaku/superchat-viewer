@@ -106,7 +106,7 @@ export default function ChannelPage() {
 
   return (
     <>
-      <Group gap="sm" ml={16} mt={8}>
+      <Group gap="sm" ml={8} mt={8}>
         <BackButton url={backUrl} />
         {
           id &&

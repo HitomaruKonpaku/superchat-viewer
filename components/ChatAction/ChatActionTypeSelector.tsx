@@ -10,6 +10,15 @@ interface IProps {
 export function ChatActionTypeSelector(props: IProps) {
   const { loading } = useContext(LoadingContext)
 
+  function getLabel(key: string): string {
+    return {
+      addSuperChatItemAction: 'addSuperChat',
+      addMembershipItemAction: 'addMembership',
+      membershipGiftPurchaseAction: 'membershipGiftPurchase',
+      membershipGiftRedemptionAction: 'membershipGiftRedemption',
+    }[key] || 'N/A'
+  }
+
   function getChecked() {
     const res = Object.values(props.form?.values || {}).every(v => v)
     return res
@@ -50,7 +59,7 @@ export function ChatActionTypeSelector(props: IProps) {
           {
             Object.keys(props.form.values).map((key) => (
               <Checkbox
-                label={key}
+                label={getLabel(key)}
                 key={props.form?.key(key)}
                 {...props.form?.getInputProps(key)}
                 defaultChecked={props.form?.getValues()[key]}

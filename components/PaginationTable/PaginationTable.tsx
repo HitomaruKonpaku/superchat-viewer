@@ -196,7 +196,7 @@ export default function PaginationTable(props: IProps) {
 
   return (
     <>
-      <Group justify={!props.search ? "center" : "flex-end"} mx={16} my={8}>
+      <Group justify={!props.search ? "center" : "flex-end"} mx={8} mt={8}>
         {
           props.search &&
           <form onSubmit={searchForm.onSubmit(onSearch)} style={{ flex: 1 }}>
@@ -237,7 +237,7 @@ export default function PaginationTable(props: IProps) {
         <Table.Tbody>{rows}</Table.Tbody>
       </Table>
 
-      <Flex justify={!props.search ? "center" : "flex-end"} mx={16} my={8}>
+      <Flex justify={!props.search ? "center" : "flex-end"} mx={8} mb={16}>
         <Pagination
           total={pageTotal}
           value={pageValue}
