@@ -103,6 +103,7 @@ SELECT type,
 FROM youtube_chat_action
 WHERE author_channel_id = $1
 GROUP BY type
+ORDER BY type
   `
 
   const { rows } = await pool.query(query, [authorId])

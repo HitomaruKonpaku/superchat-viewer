@@ -89,6 +89,7 @@ SELECT type,
 FROM youtube_chat_action
 WHERE video_id = $1
 GROUP BY type
+ORDER BY type
   `
 
   const { rows } = await pool.query(query, [videoId])

@@ -41,13 +41,22 @@ export function ChatActionTypeSelector(props: IProps) {
   }, [])
 
   async function initData() {
+    if (!props.form) {
+      return
+    }
 
     try {
       const res = await fetchData()
-      types.forEach((type) => {
+      const curTypes = props.form.values.types || []
+      const newTypes = curTypes.map((type) => {
         const obj = res.items.find((v: any) => v.type === type.key)
-        type.count = obj?.count ?? type.count
+        const newCount = obj?.count ?? type.count
+        return {
+          ...type,
+          count: newCount,
+        }
       })
+      props.form.setFieldValue('types', newTypes)
     } finally {
       // ignore
     }
