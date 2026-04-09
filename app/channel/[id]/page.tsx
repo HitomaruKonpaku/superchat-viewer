@@ -39,8 +39,8 @@ export default function ChannelPage() {
       const { data } = await api.get(url)
       document.title = data.name
       setChannel(data)
-    } catch (error) {
-      // ignore
+    } catch (error: any) {
+      console.warn(error.message)
     }
   }
 

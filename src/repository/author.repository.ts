@@ -38,13 +38,13 @@ export async function getAuthorChats(
     // .addSelect('yca.type')
     .addSelect(`
 CASE
-  WHEN type = 'addSuperChatItemAction'         THEN 00
-  WHEN type = 'addMembershipItemAction'        THEN 10
-  WHEN type = 'membershipGiftPurchaseAction'   THEN 20
-  WHEN type = 'membershipGiftRedemptionAction' THEN 21
+  WHEN type = 'addSuperChatItemAction'         THEN 1
+  WHEN type = 'addMembershipItemAction'        THEN 2
+  WHEN type = 'membershipGiftPurchaseAction'   THEN 4
+  WHEN type = 'membershipGiftRedemptionAction' THEN 8
   ELSE -1
 END
-      ` , 'type')
+      `, 'type')
     .addSelect('yca.message')
     .addSelect('yca.currency')
     .addSelect('yca.amount')
@@ -85,6 +85,33 @@ export async function getAuthorById(id: string) {
   }
 
   return rows[0]
+}
+
+export async function getSuperChatTypesByAuthorId(
+  authorId: string,
+) {
+  'use cache'
+  cacheLife('minutes')
+
+  if (!authorId) {
+    throw new Error('AUTHOR_ID_NOT_FOUND')
+  }
+
+  const query = `
+SELECT type,
+  COUNT(*) AS count
+FROM youtube_chat_action
+WHERE author_channel_id = $1
+GROUP BY type
+  `
+
+  const { rows } = await pool.query(query, [authorId])
+  const items = rows.map(v => {
+    v.count = Number(v.count)
+    return v
+  })
+
+  return { total: items.length, items }
 }
 
 export async function getSuperChatColorsByAuthorId(
@@ -132,5 +159,6 @@ ORDER BY s.id
     v.count = Number(v.count)
     return v
   })
+
   return { total: items.length, items }
 }

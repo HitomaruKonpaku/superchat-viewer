@@ -7,7 +7,6 @@ import { EmojiUtil } from '../../src/util/emoji.util'
 
 interface IProps {
   apiPath: string
-
   pollInterval?: number
 }
 
@@ -42,8 +41,6 @@ export function ChatColorSelector(props: IProps) {
   }, [])
 
   async function initData() {
-    abortController?.abort()
-
     try {
       const res = await fetchData()
       res.items.forEach((v: any) => {
@@ -85,7 +82,12 @@ export function ChatColorSelector(props: IProps) {
   }
 
   async function fetchData() {
-    const abortController = new AbortController()
+    abortController?.abort()
+    if (!props.apiPath) {
+      return { total: 0, items: [] }
+    }
+
+    abortController = new AbortController()
     const { data: { total, items } } = await api.get(
       props.apiPath,
       {

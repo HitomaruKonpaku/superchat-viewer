@@ -1,47 +1,75 @@
+import { ChatActionForm, ChatTypeOption } from '../interface/superchat.interface'
+
 export class SuperChatUtil {
-  public static getDefaultTypes() {
-    const tmp: Record<string, boolean> = {
-      addSuperChatItemAction: true,
-      addMembershipItemAction: false,
-      membershipGiftPurchaseAction: false,
-      membershipGiftRedemptionAction: false,
-    }
-    return tmp
+  public static readonly OPTIONS: ChatTypeOption[] = [
+    {
+      id: 0,
+      key: 'addSuperChatItemAction',
+      label: 'addSuperChat',
+      checked: true,
+      count: 0,
+    },
+    {
+      id: 1,
+      key: 'addMembershipItemAction',
+      label: 'addMembership',
+      checked: false,
+      count: 0,
+    },
+    {
+      id: 2,
+      key: 'membershipGiftPurchaseAction',
+      label: 'membershipGiftPurchase',
+      checked: false,
+      count: 0,
+    },
+    {
+      id: 3,
+      key: 'membershipGiftRedemptionAction',
+      label: 'membershipGiftRedemption',
+      checked: false,
+      count: 0,
+    },
+  ]
+
+  public static getTypes(options: ChatTypeOption[]): number {
+    let mask = 0
+    options.forEach((option) => {
+      if (option.checked) {
+        mask |= (1 << option.id)
+      }
+    })
+    return mask
   }
 
-  public static getInitialValues(initValue?: string | null) {
-    const tmp = SuperChatUtil.getDefaultTypes()
-    if (initValue) {
-      const arr = initValue.split(',')
-      Object.keys(tmp).forEach((key) => {
-        tmp[key] = arr.includes(key)
-      })
-    }
-    return tmp
+  public static getDefaultTypes(): number {
+    const mask = SuperChatUtil.getTypes(SuperChatUtil.OPTIONS)
+    return mask
   }
 
-  public static getTransformValues(values: any) {
-    const tmp = Object.keys(values).filter((key) => values[key])
-    return tmp.join(',')
+  public static getInitialValues(initValue?: string | null): ChatActionForm {
+    const defaultTypes = SuperChatUtil.getDefaultTypes()
+    const mask = initValue !== null
+      ? Number(initValue)
+      : defaultTypes
+    const types = SuperChatUtil.OPTIONS.map(option => ({
+      ...option,
+      checked: !!(mask & (1 << option.id))
+    }))
+    return { types }
   }
 
-  public static getTypesParam(values: any) {
-    const defaultConfig = SuperChatUtil.getDefaultTypes()
-    const defaultStr = Object.keys(values)
-      .filter(v => defaultConfig[v])
-      .join(',')
-    const tmp = Object.keys(values)
-      .filter(v => values[v])
-      .join(',')
+  public static getTransformValues(values: ChatActionForm) {
+    const res = values.types.filter(v => v.checked).map(v => v.key).join(',')
+    return res
+  }
 
-    if (!tmp) {
-      return '.'
+  public static getTypesParam(values: ChatActionForm): string {
+    const defaultTypes = SuperChatUtil.getDefaultTypes()
+    const mask = SuperChatUtil.getTypes(values.types) ?? defaultTypes
+    if (mask === defaultTypes) {
+      return ''
     }
-
-    if (tmp === defaultStr) {
-      return null
-    }
-
-    return tmp
+    return String(mask)
   }
 }

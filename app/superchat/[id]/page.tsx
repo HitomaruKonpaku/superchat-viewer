@@ -77,8 +77,8 @@ export default function SuperChatPage() {
       if (data.actual_end) {
         setPollInterval(0)
       }
-    } catch (error) {
-      // ignore
+    } catch (error: any) {
+      console.warn(error.message)
     }
   }
 
@@ -150,10 +150,14 @@ export default function SuperChatPage() {
         </Tooltip>
       </Group>
 
-      <ChatActionTypeSelector form={form} />
+      <ChatActionTypeSelector
+        form={form}
+        apiPath={`superchats/${id}/stats/types`}
+        pollInterval={pollInterval}
+      />
 
       <ChatColorSelector
-        apiPath={`superchats/${id}/colors`}
+        apiPath={`superchats/${id}/stats/colors`}
         pollInterval={pollInterval}
       />
 

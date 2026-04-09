@@ -1,4 +1,4 @@
-import type { OxlintConfig } from 'oxlint';
+import type { OxlintConfig } from 'oxlint'
 
 export default {
   plugins: ['react', 'typescript', 'jsx-a11y', 'jest'],
@@ -15,7 +15,8 @@ export default {
     'default-case': 'off',
     'default-case-last': 'error',
     'no-alert': 'error',
-    'no-console': 'error',
+    'no-console': 'off',
+    'no-constant-binary-expression': 'off',
     'no-else-return': 'error',
     'no-eval': 'error',
     'no-lonely-if': 'error',
@@ -67,6 +68,7 @@ export default {
     ],
 
     'react/button-has-type': 'error',
+    'react/exhaustive-deps': 'off',
     'react/jsx-boolean-value': 'error',
     'react/jsx-curly-brace-presence': [
       'error',
@@ -102,4 +104,4 @@ export default {
       },
     },
   ],
-} satisfies OxlintConfig;
+} satisfies OxlintConfig

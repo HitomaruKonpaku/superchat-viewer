@@ -13,7 +13,7 @@ export async function getChannels(opts: IPagination) {
     .leftJoinAndSelect('user_pool', 'up', 'up.source_id = yc.id')
     .andWhere(new Brackets((b0) => b0
       .orWhere('source_type ISNULL')
-      .orWhere(`source_type = 'YOUTUBE'`)
+      .orWhere('source_type = :source_type', { source_type: 'YOUTUBE' })
     ))
 
   if (opts.query) {
@@ -35,8 +35,8 @@ export async function getChannels(opts: IPagination) {
         .select('yc.id')
         .addSelect('yc.created_at')
         .addSelect('yc.custom_url')
-        .addSelect(`yc.name`)
-        .addSelect(`yc.thumbnail_url`)
+        .addSelect('yc.name')
+        .addSelect('yc.thumbnail_url')
         .addSelect('up.is_active')
         .addSelect('up.has_membership')
         .addOrderBy('up."has_membership"', 'DESC', 'NULLS LAST')

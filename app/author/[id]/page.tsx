@@ -78,8 +78,8 @@ export default function AuthorPage() {
       const { data } = await api.get(url)
       document.title = data.name
       setAuthor(data)
-    } catch (error) {
-      // ignore
+    } catch (error: any) {
+      console.warn(error.message)
     }
   }
 
@@ -167,10 +167,13 @@ export default function AuthorPage() {
         <Text>{author?.name}</Text>
       </Group>
 
-      <ChatActionTypeSelector form={form} />
+      <ChatActionTypeSelector
+        form={form}
+        apiPath={`authors/${id}/stats/types`}
+      />
 
       <ChatColorSelector
-        apiPath={`authors/${id}/colors`}
+        apiPath={`authors/${id}/stats/colors`}
       />
 
       <PaginationTable

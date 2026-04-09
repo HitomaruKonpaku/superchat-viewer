@@ -21,7 +21,7 @@ export function ChatActionRenderer(props: IProps) {
         element &&
         <>
           {
-            ['addSuperChatItemAction', 0].includes(element.type) &&
+            ['addSuperChatItemAction', 1].includes(element.type) &&
             <Group>
               <Text>{EmojiUtil.fromColor(element.color)}</Text>
               <Text w={40} ta="right">{element.currency}</Text>
@@ -31,7 +31,7 @@ export function ChatActionRenderer(props: IProps) {
           }
 
           {
-            ['addMembershipItemAction', 10].includes(element.type) &&
+            ['addMembershipItemAction', 2].includes(element.type) &&
             <Group bg="#0f9d58" c="white" px={8} py={4}>
               <IconStarFilled size={16} />
               <Group>
@@ -54,7 +54,7 @@ export function ChatActionRenderer(props: IProps) {
           }
 
           {
-            ['membershipGiftPurchaseAction', 20].includes(element.type) &&
+            ['membershipGiftPurchaseAction', 4].includes(element.type) &&
             <Group bg="#0f9d58" c="white" px={8} py={4}>
               <IconGiftFilled size={16} />
               <Text w={40} ta="right">{element.amount}</Text>
@@ -62,7 +62,7 @@ export function ChatActionRenderer(props: IProps) {
           }
 
           {
-            ['membershipGiftRedemptionAction', 21].includes(element.type) &&
+            ['membershipGiftRedemptionAction', 8].includes(element.type) &&
             <Group bg="#0f9d58" c="white" px={8} py={4}>
               <Text>Received a gift membership{element.sender_name && <> by {element.sender_name}</>}</Text>
             </Group>

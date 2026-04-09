@@ -39,8 +39,8 @@ export default function VideoListPage() {
     try {
       const { data } = await api.get(url)
       setChannel(data)
-    } catch (error) {
-      // ignore
+    } catch (error: any) {
+      console.warn(error.message)
     }
   }
 

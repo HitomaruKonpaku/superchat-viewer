@@ -45,13 +45,13 @@ export async function getSuperChatsByVideoId(
     // .addSelect('yca.type')
     .addSelect(`
 CASE
-  WHEN type = 'addSuperChatItemAction'         THEN 00
-  WHEN type = 'addMembershipItemAction'        THEN 10
-  WHEN type = 'membershipGiftPurchaseAction'   THEN 20
-  WHEN type = 'membershipGiftRedemptionAction' THEN 21
+  WHEN type = 'addSuperChatItemAction'         THEN 1
+  WHEN type = 'addMembershipItemAction'        THEN 2
+  WHEN type = 'membershipGiftPurchaseAction'   THEN 4
+  WHEN type = 'membershipGiftRedemptionAction' THEN 8
   ELSE -1
 END
-      ` , 'type')
+      `, 'type')
     .addSelect('yca.author_channel_id')
     .addSelect('yca.author_name')
     .addSelect('yca.author_photo')
@@ -71,6 +71,33 @@ END
 
   const { rows } = await pool.query(...queryItem.getQueryAndParameters())
   return { total: Number(count), items: rows }
+}
+
+export async function getSuperChatTypesByVideoId(
+  videoId: string,
+) {
+  'use cache'
+  cacheLife('minutes')
+
+  if (!videoId) {
+    throw new Error('VIDEO_ID_NOT_FOUND')
+  }
+
+  const query = `
+SELECT type,
+  COUNT(*) AS count
+FROM youtube_chat_action
+WHERE video_id = $1
+GROUP BY type
+  `
+
+  const { rows } = await pool.query(query, [videoId])
+  const items = rows.map(v => {
+    v.count = Number(v.count)
+    return v
+  })
+
+  return { total: items.length, items }
 }
 
 export async function getSuperChatColorsByVideoId(
@@ -118,5 +145,6 @@ ORDER BY s.id
     v.count = Number(v.count)
     return v
   })
+
   return { total: items.length, items }
 }

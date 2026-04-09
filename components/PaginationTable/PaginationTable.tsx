@@ -35,9 +35,8 @@ export default function PaginationTable(props: IProps) {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
-  const { setLoading } = useContext(LoadingContext)
-
   const mounted = useMounted()
+  const { setLoading } = useContext(LoadingContext)
 
   const [rows, setRows] = useState<any[]>([])
   const [limit, setLimit] = useState(Number(searchParams.get('limit')) || props.limit || LIMIT_DEFAULT)
@@ -127,7 +126,6 @@ export default function PaginationTable(props: IProps) {
 
   async function initData() {
     setLoading(true)
-    abortController?.abort()
 
     try {
       const { total, items } = await fetchData()
@@ -154,7 +152,12 @@ export default function PaginationTable(props: IProps) {
   }
 
   async function fetchData() {
-    const abortController = new AbortController()
+    abortController?.abort()
+    if (!props.apiPath) {
+      return { total: 0, items: [] }
+    }
+
+    abortController = new AbortController()
     const { data: { total, items } } = await api.get(
       props.apiPath,
       {
@@ -196,7 +199,7 @@ export default function PaginationTable(props: IProps) {
 
   return (
     <>
-      <Group justify={!props.search ? "center" : "flex-end"} mx={8} mt={8}>
+      <Group justify={!props.search ? 'center' : 'flex-end'} mx={8} mt={8}>
         {
           props.search &&
           <form onSubmit={searchForm.onSubmit(onSearch)} style={{ flex: 1 }}>
@@ -237,7 +240,7 @@ export default function PaginationTable(props: IProps) {
         <Table.Tbody>{rows}</Table.Tbody>
       </Table>
 
-      <Flex justify={!props.search ? "center" : "flex-end"} mx={8} mb={16}>
+      <Flex justify={!props.search ? 'center' : 'flex-end'} mx={8} mb={16}>
         <Pagination
           total={pageTotal}
           value={pageValue}
