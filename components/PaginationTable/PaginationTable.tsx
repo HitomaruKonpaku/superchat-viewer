@@ -83,10 +83,10 @@ export default function PaginationTable(props: IProps) {
 
   useEffect(() => {
     if (!mounted) { return }
-    setLimit(Number(props.limit || searchParams.get('l')) || cfg.defaultValue.limit)
-    setPageValue(Number(props.page || searchParams.get('p')) || cfg.defaultValue.page)
-    setPageTotal(1)
+    setLimit(Number(searchParams.get('l')) || props.limit || cfg.defaultValue.limit)
+    setPageValue(Number(searchParams.get('p')) || props.page || cfg.defaultValue.page)
     setQuery(searchParams.get('q') || '')
+    setPageTotal(1)
     init()
   }, [mounted])
 
