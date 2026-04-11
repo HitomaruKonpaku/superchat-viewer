@@ -1,7 +1,6 @@
 'use client'
 
 import { Anchor, Center, Group, Image, Menu, Stack, Table, Text, Tooltip } from '@mantine/core'
-import ms from 'ms'
 import { useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { BackButton } from '../../components/BackButton/BackButton'
@@ -16,13 +15,14 @@ import PaginationTable from '../../components/PaginationTable/PaginationTable'
 import { PrivacyStatusText } from '../../components/PrivacyStatusText/PrivacyStatusText'
 import { YoutubeChannelButton } from '../../components/YoutubeChannelButton/YoutubeChannelButton'
 import { api } from '../../src/api'
+import { cfg } from '../../src/cfg'
 import { VideoUtil } from '../../src/util/video.util'
 
 export default function VideoListPage() {
   const searchParams = useSearchParams()
 
   const [backUrl] = useState('/channels')
-  const [pollInterval] = useState(ms('30s'))
+  const [pollInterval] = useState(cfg.video.pollInterval)
   const channel_id = searchParams.get('channel_id')
   const [channel, setChannel] = useState<any>(null)
   const [limit] = useState(channel_id ? 50 : 20)

@@ -83,9 +83,6 @@ export async function getAuthorBaseChats(
   ]
 
   const createChatQueryBuilder = (tableName: string) => db.createQueryBuilder()
-    .from(tableName, 'yca')
-    .andWhere('author_channel_id = :authorId', { authorId })
-    .andWhere('type IN (:...types)', { types })
     .select('id')
     .addSelect('created_at')
     .addSelect('video_id')
@@ -96,6 +93,9 @@ export async function getAuthorBaseChats(
     .addSelect('is_moderator')
     .addSelect('is_verified')
     .addSelect('message')
+    .from(tableName, 'yca')
+    .andWhere('author_channel_id = :authorId', { authorId })
+    .andWhere('type IN (:...types)', { types })
 
   const queryItem = db.createQueryBuilder()
     .addCommonTableExpression(
@@ -114,7 +114,6 @@ export async function getAuthorBaseChats(
       'SELECT COUNT(*) AS _total FROM yca',
       'total',
     )
-    .from('yca', 'yca')
     .select('yca.*')
     .addSelect('yv.title', 'video_title')
     .addSelect('yc.id', 'channel_id')
@@ -122,6 +121,7 @@ export async function getAuthorBaseChats(
     .addSelect('yc.name', 'channel_name')
     .addSelect('yc.thumbnail_url', 'channel_thumbnail_url')
     .addSelect('tt.*')
+    .from('yca', 'yca')
     .leftJoin('youtube_video', 'yv', 'yv.id = yca.video_id')
     .leftJoin('youtube_channel', 'yc', 'yc.id = yv.channel_id')
     .leftJoin('total', 'tt', 'TRUE')
@@ -137,6 +137,7 @@ export async function getAuthorBaseChats(
     delete v._total
     return v
   })
+
   return { total, items }
 }
 

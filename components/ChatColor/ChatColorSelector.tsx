@@ -36,7 +36,7 @@ export function ChatColorSelector(props: IProps) {
   useEffect(() => {
     if (!mounted) { return }
     init()
-  }, [props.pollInterval])
+  }, [mounted, props.pollInterval])
 
   async function init() {
     clearInterval(timerId)

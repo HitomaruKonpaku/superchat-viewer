@@ -1,7 +1,6 @@
 'use client'
 
 import { Anchor, Center, Group, Image, Menu, Stack, Table, Text } from '@mantine/core'
-import ms from 'ms'
 import { useState } from 'react'
 import { DateTimeText } from '../../components/DateTimeText/DateTimeText'
 import PaginationTable from '../../components/PaginationTable/PaginationTable'
@@ -14,7 +13,7 @@ import MenuItemYoutubeChannel from '../../components/menu-item/MenuItemYoutubeCh
 import { cfg } from '../../src/cfg'
 
 export default function ChannelListPage() {
-  const [pollInterval] = useState(ms('60s'))
+  const [pollInterval] = useState(cfg.channel.pollInterval)
 
   function toRow(element: Record<string, any>, index: number, limit: number, page: number) {
     return (

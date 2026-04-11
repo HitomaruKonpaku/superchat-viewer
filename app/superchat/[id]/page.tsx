@@ -4,7 +4,6 @@ import { Anchor, Divider, Group, Image, Menu, Stack, Table, Text, Tooltip } from
 import { useForm } from '@mantine/form'
 import { useMounted } from '@mantine/hooks'
 import { IconStarFilled } from '@tabler/icons-react'
-import ms from 'ms'
 import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
 import { BackButton } from '../../../components/BackButton/BackButton'
@@ -28,7 +27,7 @@ export default function SuperChatPage() {
   const mounted = useMounted()
 
   const [backUrl, setBackUrl] = useState('/channels')
-  const [pollInterval, setPollInterval] = useState(ms('30s'))
+  const [pollInterval, setPollInterval] = useState(cfg.superchat.pollInterval)
   const id = useParams().id?.toString() as string
   const [video, setVideo] = useState<any>(null)
 

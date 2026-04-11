@@ -7,6 +7,7 @@ import { IconSearch, IconX } from '@tabler/icons-react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { BaseSyntheticEvent, JSX, useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { api } from '../../src/api'
+import { cfg } from '../../src/cfg'
 import { LoadingContext } from '../../src/provider/loading.provider'
 
 interface IProps {
@@ -25,9 +26,6 @@ interface IProps {
   toRow?: (element: Record<string, any>, index: number, limit: number, page: number) => JSX.Element
 }
 
-const LIMIT_DEFAULT = 10
-const PAGE_DEFAULT = 1
-
 export default function PaginationTable(props: IProps) {
   const router = useRouter()
   const pathname = usePathname()
@@ -36,13 +34,15 @@ export default function PaginationTable(props: IProps) {
   const { setLoading } = useContext(LoadingContext)
 
   const [rows, setRows] = useState<any[]>([])
-  const [limit, setLimit] = useState(LIMIT_DEFAULT)
-  const [pageValue, setPageValue] = useState(PAGE_DEFAULT)
+  const [limit, setLimit] = useState(cfg.defaultValue.limit)
+  const [pageValue, setPageValue] = useState(cfg.defaultValue.page)
   const [pageTotal, setPageTotal] = useState(1)
   const [query, setQuery] = useState('')
 
   const [timerId, setTimerId] = useState<any>()
   const [abortController, setAbortController] = useState<AbortController>()
+
+  const [isPageChanged, setIsPageChanged] = useState(false)
 
   const searchRef = useRef<HTMLInputElement>(null)
   const searchForm = useForm({
@@ -83,16 +83,16 @@ export default function PaginationTable(props: IProps) {
 
   useEffect(() => {
     if (!mounted) { return }
-    setLimit(Number(props.limit || searchParams.get('l')) || LIMIT_DEFAULT)
-    setPageValue(Number(props.page || searchParams.get('p')) || PAGE_DEFAULT)
+    setLimit(Number(props.limit || searchParams.get('l')) || cfg.defaultValue.limit)
+    setPageValue(Number(props.page || searchParams.get('p')) || cfg.defaultValue.page)
     setPageTotal(1)
     setQuery(searchParams.get('q') || '')
     init()
   }, [mounted])
 
   useEffect(() => {
-    setLimit(Number(searchParams.get('l')) || props.limit || LIMIT_DEFAULT)
-    setPageValue(Number(searchParams.get('p')) || props.page || PAGE_DEFAULT)
+    setLimit(Number(searchParams.get('l')) || props.limit || cfg.defaultValue.limit)
+    setPageValue(Number(searchParams.get('p')) || props.page || cfg.defaultValue.page)
     setQuery(searchParams.get('q') || '')
     if (!mounted) { return }
     init()
@@ -100,7 +100,7 @@ export default function PaginationTable(props: IProps) {
 
   useHotkeys([
     ['ArrowLeft', () => {
-      onPageChange(Math.max(PAGE_DEFAULT, pageValue - 1))
+      onPageChange(Math.max(cfg.defaultValue.page, pageValue - 1))
     }],
     ['ArrowRight', () => {
       onPageChange(Math.min(pageTotal, pageValue + 1))
@@ -111,7 +111,10 @@ export default function PaginationTable(props: IProps) {
     clearInterval(timerId)
     return initData()
       .then(() => {
-        window.scrollTo({ top: 0, behavior: 'smooth' })
+        if (isPageChanged) {
+          setIsPageChanged(false)
+          window.scrollTo({ top: 0, behavior: 'smooth' })
+        }
       })
       .finally(() => initTimer())
   }
@@ -156,6 +159,11 @@ export default function PaginationTable(props: IProps) {
     }
     const controller = new AbortController()
     setAbortController(controller)
+
+    if (cfg.debug) {
+      console.warn('fetchData', { url: props.apiPath, params })
+    }
+
     const { data: { total, items } } = await api.get(
       props.apiPath,
       {
@@ -167,6 +175,7 @@ export default function PaginationTable(props: IProps) {
   }
 
   function onPageChange(value: number) {
+    setIsPageChanged(true)
     setPageValue(value)
     setParams({ p: value !== 1 ? value : null })
   }
@@ -191,6 +200,18 @@ export default function PaginationTable(props: IProps) {
     setParams({ q: null, p: null })
     searchForm.setValues({ search: '' })
     setTimeout(() => searchRef?.current?.focus())
+  }
+
+  function getPagination() {
+    return (
+      <Pagination
+        total={pageTotal}
+        value={pageValue}
+        size='lg'
+        withEdges
+        onChange={onPageChange}
+      />
+    )
   }
 
   return (
@@ -222,13 +243,7 @@ export default function PaginationTable(props: IProps) {
           </form>
         }
 
-        <Pagination
-          total={pageTotal}
-          value={pageValue}
-          size='lg'
-          withEdges
-          onChange={onPageChange}
-        />
+        {getPagination()}
       </Group>
 
       <Table stickyHeader striped={props.striped} highlightOnHover withTableBorder withColumnBorders>
@@ -237,13 +252,7 @@ export default function PaginationTable(props: IProps) {
       </Table>
 
       <Flex justify={!props.search ? 'center' : 'flex-end'} mx={8} mb={16}>
-        <Pagination
-          total={pageTotal}
-          value={pageValue}
-          size='lg'
-          withEdges
-          onChange={onPageChange}
-        />
+        {getPagination()}
       </Flex>
     </>
   )

@@ -3,7 +3,6 @@
 import { Anchor, Divider, Group, Image, Menu, Stack, Table, Tabs, Text } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { useMounted } from '@mantine/hooks'
-import ms from 'ms'
 import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
 import { BackButton } from '../../../components/BackButton/BackButton'
@@ -31,7 +30,7 @@ export default function AuthorPage() {
   const mounted = useMounted()
 
   const [backUrl] = useState('/channels')
-  const [pollInterval] = useState(ms('60s'))
+  const [pollInterval] = useState(cfg.author.chat.pollInterval)
   const id = useParams().id?.toString() as string
   const [author, setAuthor] = useState<any>(null)
 
