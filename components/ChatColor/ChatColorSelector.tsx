@@ -6,12 +6,9 @@ import { ColorUtil } from '../../src/util/color.util'
 import { EmojiUtil } from '../../src/util/emoji.util'
 
 interface IProps {
-  apiPath: string
+  apiPath?: string
   pollInterval?: number
 }
-
-let abortController!: AbortController
-let timerId!: any
 
 export function ChatColorSelector(props: IProps) {
   const mounted = useMounted()
@@ -26,19 +23,41 @@ export function ChatColorSelector(props: IProps) {
     7: 0,
   })
 
-  useEffect(() => {
-    initTimer()
-  }, [props.pollInterval])
-
-  useEffect(() => {
-    reload()
-  }, [mounted])
+  const [timerId, setTimerId] = useState<any>()
+  const [abortController, setAbortController] = useState<AbortController>()
 
   useEffect(() => {
     return () => {
       clearInterval(timerId)
+      abortController?.abort()
     }
   }, [])
+
+  useEffect(() => {
+    if (!mounted) { return }
+    init()
+  }, [props.pollInterval])
+
+  async function init() {
+    clearInterval(timerId)
+    return initData()
+      .finally(() => initTimer())
+  }
+
+  function initTimer() {
+    clearInterval(timerId)
+    if (!props.pollInterval) {
+      return
+    }
+
+    setTimerId(setTimeout(
+      () => {
+        initData()
+          .finally(() => initTimer())
+      },
+      props.pollInterval,
+    ))
+  }
 
   async function initData() {
     try {
@@ -52,46 +71,18 @@ export function ChatColorSelector(props: IProps) {
     }
   }
 
-  function reload() {
-    if (mounted) {
-      init()
-    }
-  }
-
-  function init() {
-    clearInterval(timerId)
-    initData()
-      .finally(() => {
-        initTimer()
-      })
-  }
-
-  function initTimer() {
-    clearInterval(timerId)
-    if (!props.pollInterval) {
-      return
-    }
-
-    timerId = setTimeout(
-      () => {
-        initData()
-          .finally(() => initTimer())
-      },
-      props.pollInterval,
-    )
-  }
-
   async function fetchData() {
     abortController?.abort()
     if (!props.apiPath) {
       return { total: 0, items: [] }
     }
 
-    abortController = new AbortController()
+    const controller = new AbortController()
+    setAbortController(controller)
     const { data: { total, items } } = await api.get(
       props.apiPath,
       {
-        signal: abortController.signal,
+        signal: controller.signal,
       },
     )
     return { total, items }
@@ -99,15 +90,15 @@ export function ChatColorSelector(props: IProps) {
 
   return (
     <>
-      <Flex gap="sm" wrap="wrap" mx="md" my={0}>
-        <Tooltip label="ALL">
+      <Flex gap='sm' wrap='wrap' mx='md' my={0}>
+        <Tooltip label='ALL'>
           <Text>{`Σ ${Object.values(items).reduce((sum, cv) => sum + cv)}`}</Text>
         </Tooltip>
 
         {
           Object.keys(items).map((key) => (
             <Fragment key={key}>
-              <Divider orientation="vertical" />
+              <Divider orientation='vertical' />
               <Tooltip label={ColorUtil.fromSignificance(key)}>
                 <Text>{`${EmojiUtil.fromSignificance(key)} ${items[key]}`}</Text>
               </Tooltip>

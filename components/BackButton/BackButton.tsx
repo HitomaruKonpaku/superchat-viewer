@@ -20,8 +20,8 @@ export function BackButton({ url, defaultUrl }: { url?: string, defaultUrl?: str
   }
 
   return (
-    <Tooltip label="Back">
-      <ActionIcon variant="light" size="xl" radius="xl" aria-label="Back" onClick={onClick}>
+    <Tooltip label='Back'>
+      <ActionIcon variant='light' size='xl' radius='xl' aria-label='Back' onClick={onClick}>
         <IconArrowBack style={{ width: '70%', height: '70%' }} stroke={1.5} />
       </ActionIcon>
     </Tooltip>

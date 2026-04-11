@@ -2,34 +2,35 @@
 
 import { Anchor, Divider, Group, Image, Menu, Stack, Table, Text, Tooltip } from '@mantine/core'
 import { useForm } from '@mantine/form'
+import { useMounted } from '@mantine/hooks'
 import { IconStarFilled } from '@tabler/icons-react'
 import ms from 'ms'
 import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
 import { BackButton } from '../../../components/BackButton/BackButton'
 import { ChatActionRenderer } from '../../../components/ChatAction/ChatActionRenderer'
-import { ChatActionTypeSelector } from '../../../components/ChatAction/ChatActionTypeSelector'
-import { ChatColorSelector } from '../../../components/ChatColor/ChatColorSelector'
+import { SuperChatRenderer } from '../../../components/ChatRenderer/SuperChatRenderer'
 import { DateTimeText } from '../../../components/DateTimeText/DateTimeText'
 import MenuItemAppAuthorChat from '../../../components/menu-item/MenuItemAppAuthorChat'
 import MenuItemAppVideo from '../../../components/menu-item/MenuItemAppChannel'
 import MenuItemCopy from '../../../components/menu-item/MenuItemCopy'
 import MenuItemHolodexChannel from '../../../components/menu-item/MenuItemHolodexChannel'
 import MenuItemYoutubeChannel from '../../../components/menu-item/MenuItemYoutubeChannel'
-import PaginationTable from '../../../components/PaginationTable/PaginationTable'
 import { YoutubeVideoButton } from '../../../components/YoutubeVideoButton/YoutubeVideoButton'
 import { api } from '../../../src/api'
+import { cfg } from '../../../src/cfg'
 import { SuperChatUtil } from '../../../src/util/superchat.util'
 
 export default function SuperChatPage() {
-  const [pollInterval, setPollInterval] = useState(ms('30s'))
-  const id = useParams().id?.toString() as string
-  const [backUrl, setBackUrl] = useState('/channels')
-  const [video, setVideo] = useState<any>(null)
-
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
+  const mounted = useMounted()
+
+  const [backUrl, setBackUrl] = useState('/channels')
+  const [pollInterval, setPollInterval] = useState(ms('30s'))
+  const id = useParams().id?.toString() as string
+  const [video, setVideo] = useState<any>(null)
 
   const form = useForm({
     mode: 'uncontrolled',
@@ -37,23 +38,24 @@ export default function SuperChatPage() {
     transformValues: SuperChatUtil.getTransformValues,
   })
 
-  const updateSearchParams = useCallback(
-    (newParams: { [key: string]: string | null }) => {
-      const curParams = new URLSearchParams(searchParams.toString())
+  const createQueryString = useCallback(
+    (newParams: Record<string, string | undefined | null>) => {
+      const params = new URLSearchParams(searchParams.toString())
       Object.keys(newParams).forEach((key) => {
         const value = newParams[key]
-        curParams.delete(key)
-        if (value) {
-          curParams.set(key, value)
+        if (value === undefined || value === null || value === '') {
+          params.delete(key)
+        } else {
+          params.set(key, value)
         }
       })
-      return curParams.toString()
+      return params.toString()
     },
     [searchParams]
   )
 
-  const updateParams = (params: Record<string, any>) => {
-    const qs = updateSearchParams(params)
+  const setParams = (params: Record<string, any | undefined | null>) => {
+    const qs = createQueryString(params)
     const href = `${pathname}?${qs}`
     router.push(href)
   }
@@ -63,8 +65,9 @@ export default function SuperChatPage() {
   }, [])
 
   useEffect(() => {
+    if (!mounted) { return }
     const types = SuperChatUtil.getTypesParam(form.values)
-    updateParams({ types })
+    setParams({ types, p: null })
   }, [form.values])
 
   async function initData() {
@@ -85,8 +88,8 @@ export default function SuperChatPage() {
   function toRow(element: Record<string, any>, index: number, limit: number, page: number) {
     return (
       <Table.Tr key={element.id}>
-        <Table.Td ta="right">
-          <Text size="sm">{(index + 1) + (limit * (page - 1))}</Text>
+        <Table.Td ta='right'>
+          <Text size='sm'>{(index + 1) + (limit * (page - 1))}</Text>
         </Table.Td>
 
         <Table.Td >
@@ -96,18 +99,18 @@ export default function SuperChatPage() {
                 element.author_photo &&
                 <Image
                   src={element.author_photo}
-                  referrerPolicy="no-referrer"
-                  radius="sm"
+                  referrerPolicy='no-referrer'
+                  radius='sm'
                   w={40}
                   h={40}
                 />
               }
 
               <Stack gap={2} flex={1}>
-                <Menu position="bottom-start">
+                <Menu position='bottom-start'>
                   <Menu.Target>
-                    <Anchor underline="never">
-                      <Text ta="justify">{element.author_name}</Text>
+                    <Anchor underline='never'>
+                      <Text ta='justify'>{element.author_name}</Text>
                     </Anchor>
                   </Menu.Target>
 
@@ -118,15 +121,15 @@ export default function SuperChatPage() {
                     <MenuItemAppVideo id={element.author_channel_id} />
                     <MenuItemAppAuthorChat id={element.author_channel_id} />
                     <Menu.Divider />
-                    <MenuItemCopy value={element.author_channel_id} label="Copy ID" />
-                    <MenuItemCopy value={element.author_name} label="Copy name" />
+                    <MenuItemCopy value={element.author_channel_id} label='Copy ID' />
+                    <MenuItemCopy value={element.author_name} label='Copy name' />
                   </Menu.Dropdown>
                 </Menu>
 
                 <DateTimeText
                   value={element.created_at}
-                  size="sm"
-                  menuPosition="bottom-start"
+                  size='sm'
+                  menuPosition='bottom-start'
                 />
               </Stack>
             </Group>
@@ -141,39 +144,26 @@ export default function SuperChatPage() {
 
   return (
     <>
-      <Group gap="sm" ml={8} mt={8}>
+      <Group gap='sm' ml={8} mt={8}>
         <BackButton url={backUrl} />
         <YoutubeVideoButton id={id} />
-        {video?.is_members_only && <Tooltip label="Members only"><IconStarFilled color="lime" size={16} /></Tooltip>}
+        {video?.is_members_only && <Tooltip label='Members only'><IconStarFilled color='lime' size={16} /></Tooltip>}
         <Tooltip label={video?.description} disabled={!video?.description} multiline>
           <Text>{video?.title}</Text>
         </Tooltip>
       </Group>
 
-      <ChatActionTypeSelector
+      <SuperChatRenderer
+        listApiPath={`superchats/${id}`}
+        listApiParams={{ types: form.getTransformedValues() }}
+        statsTypesApiPath={`superchats/${id}/stats/types`}
+        statsColorsApiPath={`superchats/${id}/stats/colors`}
         form={form}
-        apiPath={`superchats/${id}/stats/types`}
+        limit={cfg.superchat.limit}
         pollInterval={pollInterval}
-      />
-
-      <ChatColorSelector
-        apiPath={`superchats/${id}/stats/colors`}
-        pollInterval={pollInterval}
-      />
-
-      <PaginationTable
-        apiPath={`superchats/${id}`}
-        apiParams={{ types: form.getTransformedValues() }}
-        limit={500}
-        pollInterval={pollInterval}
-        thead={
-          <Table.Tr>
-            <Table.Th w={0} ta="center">#</Table.Th>
-            <Table.Th />
-          </Table.Tr>
-        }
         toRow={toRow}
-      />
+      >
+      </SuperChatRenderer>
     </>
   )
 }

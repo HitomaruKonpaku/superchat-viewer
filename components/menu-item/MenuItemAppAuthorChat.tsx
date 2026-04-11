@@ -10,8 +10,8 @@ export default function MenuItemAppAuthorChat(props: IProps) {
   return (
     <Anchor
       href={`/author/${props.id}`}
-      target="_blank"
-      underline="never"
+      target='_blank'
+      underline='never'
     >
       <Menu.Item leftSection={<IconMessage size={14} />}>
         {props.label || 'Show author'}

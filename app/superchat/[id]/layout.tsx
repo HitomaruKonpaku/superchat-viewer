@@ -64,14 +64,14 @@ export default async function Layout(
     return (
       <>
         <Head>
-          <link rel="alternate" type="application/json+oembed" href={oembedHref} />
-          <link rel="image_src" href={VideoUtil.toThumbnailMaxRes(id)} />
-          <meta property="og:url" content={`${appUrl}/superchat/${id}`} />
-          <meta property="og:title" content={video.title} />
-          <meta property="og:image" content={VideoUtil.toThumbnailMaxRes(id)} />
-          <meta property="twitter:url" content={`${appUrl}/superchat/${id}`} />
-          <meta property="twitter:title" content={video.title} />
-          <meta property="twitter:image" content={VideoUtil.toThumbnailMaxRes(id)} />
+          <link rel='alternate' type='application/json+oembed' href={oembedHref} />
+          <link rel='image_src' href={VideoUtil.toThumbnailMaxRes(id)} />
+          <meta property='og:url' content={`${appUrl}/superchat/${id}`} />
+          <meta property='og:title' content={video.title} />
+          <meta property='og:image' content={VideoUtil.toThumbnailMaxRes(id)} />
+          <meta property='twitter:url' content={`${appUrl}/superchat/${id}`} />
+          <meta property='twitter:title' content={video.title} />
+          <meta property='twitter:image' content={VideoUtil.toThumbnailMaxRes(id)} />
         </Head>
 
         <SuperChatPage />

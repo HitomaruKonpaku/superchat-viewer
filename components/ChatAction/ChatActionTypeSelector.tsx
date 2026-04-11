@@ -1,7 +1,7 @@
 import { Checkbox, Flex } from '@mantine/core'
 import { UseFormReturnType } from '@mantine/form'
 import { useMounted } from '@mantine/hooks'
-import { BaseSyntheticEvent, useContext, useEffect } from 'react'
+import { BaseSyntheticEvent, useContext, useEffect, useState } from 'react'
 import { api } from '../../src/api'
 import { ChatActionForm, ChatTypeOption } from '../../src/interface/superchat.interface'
 import { LoadingContext } from '../../src/provider/loading.provider'
@@ -12,12 +12,12 @@ interface IProps {
   pollInterval?: number
 }
 
-let abortController!: AbortController
-let timerId!: any
-
 export function ChatActionTypeSelector(props: IProps) {
   const mounted = useMounted()
   const { loading } = useContext(LoadingContext)
+
+  const [timerId, setTimerId] = useState<any>()
+  const [abortController, setAbortController] = useState<AbortController>()
 
   const types = props.form?.values?.types || []
 
@@ -27,18 +27,37 @@ export function ChatActionTypeSelector(props: IProps) {
   const allLabel = `ALL (${allCount})`
 
   useEffect(() => {
-    initTimer()
-  }, [props.pollInterval])
-
-  useEffect(() => {
-    reload()
-  }, [mounted])
-
-  useEffect(() => {
     return () => {
       clearInterval(timerId)
+      abortController?.abort()
     }
   }, [])
+
+  useEffect(() => {
+    if (!mounted) { return }
+    init()
+  }, [props.pollInterval])
+
+  async function init() {
+    clearInterval(timerId)
+    return initData()
+      .finally(() => initTimer())
+  }
+
+  function initTimer() {
+    clearInterval(timerId)
+    if (!props.pollInterval) {
+      return
+    }
+
+    setTimerId(setTimeout(
+      () => {
+        initData()
+          .finally(() => initTimer())
+      },
+      props.pollInterval,
+    ))
+  }
 
   async function initData() {
     if (!props.form) {
@@ -62,46 +81,18 @@ export function ChatActionTypeSelector(props: IProps) {
     }
   }
 
-  function reload() {
-    if (mounted) {
-      init()
-    }
-  }
-
-  function init() {
-    clearInterval(timerId)
-    initData()
-      .finally(() => {
-        initTimer()
-      })
-  }
-
-  function initTimer() {
-    clearInterval(timerId)
-    if (!props.pollInterval) {
-      return
-    }
-
-    timerId = setTimeout(
-      () => {
-        initData()
-          .finally(() => initTimer())
-      },
-      props.pollInterval,
-    )
-  }
-
   async function fetchData() {
     abortController?.abort()
     if (!props.apiPath) {
       return { total: 0, items: [] }
     }
 
-    abortController = new AbortController()
+    const controller = new AbortController()
+    setAbortController(controller)
     const { data: { total, items } } = await api.get(
       props.apiPath,
       {
-        signal: abortController.signal,
+        signal: controller.signal,
       },
     )
     return { total, items }
@@ -133,7 +124,7 @@ export function ChatActionTypeSelector(props: IProps) {
     <>
       {
         props.form &&
-        <Flex gap="md" wrap="wrap" mx="md" my={0}>
+        <Flex gap='md' wrap='wrap' mx='md' my={0}>
           <Checkbox
             label={allLabel}
             checked={allChecked}

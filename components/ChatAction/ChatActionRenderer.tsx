@@ -24,15 +24,15 @@ export function ChatActionRenderer(props: IProps) {
             ['addSuperChatItemAction', 1].includes(element.type) &&
             <Group>
               <Text>{EmojiUtil.fromColor(element.color)}</Text>
-              <Text w={40} ta="right">{element.currency}</Text>
-              <Text w={80} ta="right">{element.amount}</Text>
-              {element.sc_counter && <Text w={40} ta="right">{element.sc_counter}</Text>}
+              <Text w={40} ta='right'>{element.currency}</Text>
+              <Text w={80} ta='right'>{element.amount}</Text>
+              {element.sc_counter && <Text w={40} ta='right'>{element.sc_counter}</Text>}
             </Group>
           }
 
           {
             ['addMembershipItemAction', 2].includes(element.type) &&
-            <Group bg="#0f9d58" c="white" px={8} py={4}>
+            <Group bg='#0f9d58' c='white' px={8} py={4}>
               <IconStarFilled size={16} />
               <Group>
                 {
@@ -44,7 +44,7 @@ export function ChatActionRenderer(props: IProps) {
                   element.membership_thumbnail &&
                   <Image
                     src={element.membership_thumbnail}
-                    referrerPolicy="no-referrer"
+                    referrerPolicy='no-referrer'
                     w={20}
                     h={20}
                   />
@@ -55,15 +55,15 @@ export function ChatActionRenderer(props: IProps) {
 
           {
             ['membershipGiftPurchaseAction', 4].includes(element.type) &&
-            <Group bg="#0f9d58" c="white" px={8} py={4}>
+            <Group bg='#0f9d58' c='white' px={8} py={4}>
               <IconGiftFilled size={16} />
-              <Text w={40} ta="right">{element.amount}</Text>
+              <Text w={40} ta='right'>{element.amount}</Text>
             </Group>
           }
 
           {
             ['membershipGiftRedemptionAction', 8].includes(element.type) &&
-            <Group bg="#0f9d58" c="white" px={8} py={4}>
+            <Group bg='#0f9d58' c='white' px={8} py={4}>
               <Text>Received a gift membership{element.sender_name && <> by {element.sender_name}</>}</Text>
             </Group>
           }
@@ -71,17 +71,20 @@ export function ChatActionRenderer(props: IProps) {
           {
             element.message &&
             <>
-              <Divider my={4} />
+              {
+                element.type &&
+                <Divider my={4} />
+              }
 
-              <Menu position="bottom-start">
+              <Menu position='bottom-start'>
                 <Menu.Target>
-                  <Text ta="justify" style={{ wordBreak: 'break-word' }}>
+                  <Text ta='justify' style={{ wordBreak: 'break-word' }}>
                     {element.message}
                   </Text>
                 </Menu.Target>
 
                 <Menu.Dropdown>
-                  <MenuItemCopy value={element.message} label="Copy" />
+                  <MenuItemCopy value={element.message} label='Copy' />
                 </Menu.Dropdown>
               </Menu>
             </>

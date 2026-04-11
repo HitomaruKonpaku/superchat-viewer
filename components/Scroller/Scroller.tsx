@@ -13,11 +13,11 @@ export function Scroller() {
   }
 
   return (
-    <Stack gap="xs" pos="fixed" bottom={64} right={16} opacity={0.8} >
-      <ActionIcon variant="light" size="xl" radius="xl" onClick={onClickTop}>
+    <Stack gap='xs' pos='fixed' bottom={64} right={16} opacity={0.8} >
+      <ActionIcon variant='light' size='xl' radius='xl' onClick={onClickTop}>
         <IconArrowUp />
       </ActionIcon>
-      <ActionIcon variant="light" size="xl" radius="xl" onClick={onClickBottom}>
+      <ActionIcon variant='light' size='xl' radius='xl' onClick={onClickBottom}>
         <IconArrowDown />
       </ActionIcon>
     </Stack>

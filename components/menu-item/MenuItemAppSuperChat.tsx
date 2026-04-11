@@ -10,8 +10,8 @@ export default function MenuItemAppSuperChat(props: IProps) {
   return (
     <Anchor
       href={`/superchat/${props.id}`}
-      target="_blank"
-      underline="never"
+      target='_blank'
+      underline='never'
     >
       <Menu.Item leftSection={<IconMessage size={14} />}>
         {props.label || 'Show SuperChat'}

@@ -10,8 +10,8 @@ export default function MenuItemAppVideo(props: IProps) {
   return (
     <Anchor
       href={`/channel/${props.id}`}
-      target="_blank"
-      underline="never"
+      target='_blank'
+      underline='never'
     >
       <Menu.Item leftSection={<IconVideo size={14} />}>
         {props.label || 'Show channel'}

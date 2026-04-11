@@ -56,13 +56,13 @@ export default async function Layout(
     return (
       <>
         <Head>
-          <link rel="image_src" href={author.photo} />
-          <meta property="og:url" content={`${appUrl}/author/${id}`} />
-          <meta property="og:title" content={author.name} />
-          <meta property="og:image" content={author.photo} />
-          <meta property="twitter:url" content={`${appUrl}/author/${id}`} />
-          <meta property="twitter:title" content={author.name} />
-          <meta property="twitter:image" content={author.photo} />
+          <link rel='image_src' href={author.photo} />
+          <meta property='og:url' content={`${appUrl}/author/${id}`} />
+          <meta property='og:title' content={author.name} />
+          <meta property='og:image' content={author.photo} />
+          <meta property='twitter:url' content={`${appUrl}/author/${id}`} />
+          <meta property='twitter:title' content={author.name} />
+          <meta property='twitter:image' content={author.photo} />
         </Head>
 
         <AuthorPage />

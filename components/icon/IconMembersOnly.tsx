@@ -6,8 +6,8 @@ export function IconMembersOnly(props: { value: boolean, size?: number }) {
     <>
       {
         props.value &&
-        <Tooltip label="Members-only">
-          <IconStarFilled size={props.size} color="lime" />
+        <Tooltip label='Members-only'>
+          <IconStarFilled size={props.size} color='lime' />
         </Tooltip>
       }
     </>

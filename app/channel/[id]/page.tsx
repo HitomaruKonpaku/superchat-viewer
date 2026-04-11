@@ -16,6 +16,7 @@ import PaginationTable from '../../../components/PaginationTable/PaginationTable
 import { PrivacyStatusText } from '../../../components/PrivacyStatusText/PrivacyStatusText'
 import { YoutubeChannelButton } from '../../../components/YoutubeChannelButton/YoutubeChannelButton'
 import { api } from '../../../src/api'
+import { cfg } from '../../../src/cfg'
 import { VideoUtil } from '../../../src/util/video.util'
 
 export default function ChannelPage() {
@@ -23,7 +24,7 @@ export default function ChannelPage() {
   const id = useParams().id?.toString() as string
   const [backUrl] = useState('/channels')
   const [channel, setChannel] = useState<any>(null)
-  const [limit] = useState(id ? 50 : 20)
+  const [limit] = useState(id ? cfg.video.limit : 20)
 
   useEffect(() => {
     initData()
@@ -47,17 +48,17 @@ export default function ChannelPage() {
   function toRow(element: Record<string, any>, index: number, limit: number, page: number) {
     return (
       <Table.Tr key={element.id}>
-        <Table.Td ta="right">
-          <Text size="sm">{(index + 1) + (limit * (page - 1))}</Text>
+        <Table.Td ta='right'>
+          <Text size='sm'>{(index + 1) + (limit * (page - 1))}</Text>
         </Table.Td>
 
         <Table.Td p={0}>
-          <Anchor href={`/superchat/${element.id}`} h="100%">
+          <Anchor href={`/superchat/${element.id}`} h='100%'>
             <Center>
               <Image
                 src={VideoUtil.toThumbnailMq(element.id)}
-                referrerPolicy="no-referrer"
-                radius="sm"
+                referrerPolicy='no-referrer'
+                radius='sm'
                 maw={320}
                 mah={180}
               />
@@ -66,14 +67,14 @@ export default function ChannelPage() {
         </Table.Td>
 
         <Table.Td>
-          <Menu position="bottom-start">
+          <Menu position='bottom-start'>
             <Menu.Target>
               <Stack gap={4}>
-                <Anchor underline="never">
-                  <Text size="sm" ta="justify">{element.id}</Text>
+                <Anchor underline='never'>
+                  <Text size='sm' ta='justify'>{element.id}</Text>
                 </Anchor>
-                <Anchor underline="never">
-                  <Text size="sm" ta="justify">{element.title}</Text>
+                <Anchor underline='never'>
+                  <Text size='sm' ta='justify'>{element.title}</Text>
                 </Anchor>
                 <Group>
                   <IconBoolean value={element.is_active} size={16} />
@@ -89,15 +90,15 @@ export default function ChannelPage() {
               <Menu.Divider />
               <MenuItemAppSuperChat id={element.id} />
               <Menu.Divider />
-              <MenuItemCopy value={element.id} label="Copy ID" />
-              <MenuItemCopy value={element.title} label="Copy title" />
+              <MenuItemCopy value={element.id} label='Copy ID' />
+              <MenuItemCopy value={element.title} label='Copy title' />
             </Menu.Dropdown>
           </Menu>
 
           <DateTimeText
             value={element.created_at}
-            size="sm"
-            menuPosition="bottom-start"
+            size='sm'
+            menuPosition='bottom-start'
           />
         </Table.Td>
       </Table.Tr>
@@ -106,7 +107,7 @@ export default function ChannelPage() {
 
   return (
     <>
-      <Group gap="sm" ml={8} mt={8}>
+      <Group gap='sm' ml={8} mt={8}>
         <BackButton url={backUrl} />
         {
           id &&
@@ -119,14 +120,14 @@ export default function ChannelPage() {
       </Group>
 
       <PaginationTable
-        apiPath="videos"
+        apiPath='videos'
         apiParams={{ channel_id: id }}
         limit={limit}
         pollInterval={pollInterval}
         search
         thead={
           <Table.Tr>
-            <Table.Th w={0} ta="center">#</Table.Th>
+            <Table.Th w={0} ta='center'>#</Table.Th>
             <Table.Th w={120} />
             <Table.Th />
           </Table.Tr>

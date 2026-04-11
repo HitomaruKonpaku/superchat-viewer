@@ -11,8 +11,8 @@ export default function MenuItemHolodexChannel(props: IProps) {
   return (
     <Anchor
       href={HolodexUtil.toChannelUrl(props.id)}
-      target="_blank"
-      underline="never"
+      target='_blank'
+      underline='never'
     >
       <Menu.Item leftSection={<IconHolodex size={14} />}>
         {props.label || 'Open Holodex'}

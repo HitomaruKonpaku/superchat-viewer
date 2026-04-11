@@ -11,8 +11,8 @@ export default function MenuItemYoutubeChannel(props: IProps) {
   return (
     <Anchor
       href={ChannelUtil.toUrl(props.id)}
-      target="_blank"
-      underline="never"
+      target='_blank'
+      underline='never'
     >
       <Menu.Item leftSection={<IconBrandYoutube size={14} />}>
         {props.label || 'Open channel'}

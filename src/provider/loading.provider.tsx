@@ -17,7 +17,7 @@ export const LoadingProvider = ({ children }: { children: any }) => {
     <LoadingContext.Provider value={{ loading, setLoading }}>
       {
         loading
-        && <Progress value={100} radius="xs" size="sm" striped animated pos="fixed" top={0} w="100%" style={{ zIndex: 5 }} />
+        && <Progress value={100} radius='xs' size='sm' striped animated pos='fixed' top={0} w='100%' style={{ zIndex: 5 }} />
       }
       {children}
     </LoadingContext.Provider>

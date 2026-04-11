@@ -56,14 +56,14 @@ export default async function Layout(
     return (
       <>
         <Head>
-          <meta property="og:url" content={`${appUrl}/channel/${id}`} />
-          <meta property="og:title" content={channel.name} />
-          <meta property="og:description" content={channel.description} />
-          <meta property="og:image" content={channel.thumbnail_url} />
-          <meta property="twitter:url" content={`${appUrl}/channel/${id}`} />
-          <meta property="twitter:title" content={channel.name} />
-          <meta property="twitter:description" content={channel.description} />
-          <meta property="twitter:image" content={channel.thumbnail_url} />
+          <meta property='og:url' content={`${appUrl}/channel/${id}`} />
+          <meta property='og:title' content={channel.name} />
+          <meta property='og:description' content={channel.description} />
+          <meta property='og:image' content={channel.thumbnail_url} />
+          <meta property='twitter:url' content={`${appUrl}/channel/${id}`} />
+          <meta property='twitter:title' content={channel.name} />
+          <meta property='twitter:description' content={channel.description} />
+          <meta property='twitter:image' content={channel.thumbnail_url} />
         </Head>
 
         <ChannelPage />

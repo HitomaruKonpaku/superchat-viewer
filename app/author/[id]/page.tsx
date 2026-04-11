@@ -1,13 +1,15 @@
 'use client'
 
-import { Anchor, Divider, Group, Image, Menu, Stack, Table, Text } from '@mantine/core'
+import { Anchor, Divider, Group, Image, Menu, Stack, Table, Tabs, Text } from '@mantine/core'
 import { useForm } from '@mantine/form'
+import { useMounted } from '@mantine/hooks'
+import ms from 'ms'
 import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
 import { BackButton } from '../../../components/BackButton/BackButton'
 import { ChatActionRenderer } from '../../../components/ChatAction/ChatActionRenderer'
-import { ChatActionTypeSelector } from '../../../components/ChatAction/ChatActionTypeSelector'
-import { ChatColorSelector } from '../../../components/ChatColor/ChatColorSelector'
+import { CommonChatRenderer } from '../../../components/ChatRenderer/CommonChatRenderer'
+import { SuperChatRenderer } from '../../../components/ChatRenderer/SuperChatRenderer'
 import { DateTimeText } from '../../../components/DateTimeText/DateTimeText'
 import MenuItemAppAuthorChat from '../../../components/menu-item/MenuItemAppAuthorChat'
 import MenuItemAppVideo from '../../../components/menu-item/MenuItemAppChannel'
@@ -17,20 +19,24 @@ import MenuItemHolodexChannel from '../../../components/menu-item/MenuItemHolode
 import MenuItemHolodexVideo from '../../../components/menu-item/MenuItemHolodexVideo'
 import MenuItemYoutubeChannel from '../../../components/menu-item/MenuItemYoutubeChannel'
 import MenuItemYoutubeVideo from '../../../components/menu-item/MenuItemYoutubeVideo'
-import PaginationTable from '../../../components/PaginationTable/PaginationTable'
 import { YoutubeChannelButton } from '../../../components/YoutubeChannelButton/YoutubeChannelButton'
 import { api } from '../../../src/api'
+import { cfg } from '../../../src/cfg'
 import { SuperChatUtil } from '../../../src/util/superchat.util'
 
 export default function AuthorPage() {
-  const [backUrl] = useState('/channels')
-  const id = useParams().id?.toString() as string
-  const [author, setAuthor] = useState<any>(null)
-
-
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
+  const mounted = useMounted()
+
+  const [backUrl] = useState('/channels')
+  const [pollInterval] = useState(ms('60s'))
+  const id = useParams().id?.toString() as string
+  const [author, setAuthor] = useState<any>(null)
+
+  const [defaultTab] = useState('sc')
+  const [activeTab, setActiveTab] = useState<string>(searchParams.get('tab') || defaultTab)
 
   const form = useForm({
     mode: 'uncontrolled',
@@ -38,23 +44,24 @@ export default function AuthorPage() {
     transformValues: SuperChatUtil.getTransformValues,
   })
 
-  const updateSearchParams = useCallback(
-    (newParams: { [key: string]: string | null }) => {
-      const curParams = new URLSearchParams(searchParams.toString())
+  const createQueryString = useCallback(
+    (newParams: Record<string, string | undefined | null>) => {
+      const params = new URLSearchParams(searchParams.toString())
       Object.keys(newParams).forEach((key) => {
         const value = newParams[key]
-        curParams.delete(key)
-        if (value) {
-          curParams.set(key, value)
+        if (value === undefined || value === null || value === '') {
+          params.delete(key)
+        } else {
+          params.set(key, value)
         }
       })
-      return curParams.toString()
+      return params.toString()
     },
     [searchParams]
   )
 
-  const updateParams = (params: Record<string, any>) => {
-    const qs = updateSearchParams(params)
+  const setParams = (params: Record<string, any | undefined | null>) => {
+    const qs = createQueryString(params)
     const href = `${pathname}?${qs}`
     router.push(href)
   }
@@ -64,9 +71,28 @@ export default function AuthorPage() {
   }, [])
 
   useEffect(() => {
+    if (!mounted) { return }
     const types = SuperChatUtil.getTypesParam(form.values)
-    updateParams({ types })
+    setParams({ types, p: null })
   }, [form.values])
+
+  useEffect(() => {
+    const tab = searchParams.get('tab')
+    setActiveTab(tab || defaultTab)
+  }, [searchParams])
+
+  function getTabValue(value: string | null) {
+    return value ?? defaultTab
+  }
+
+  function onTabChange(value: string | null) {
+    const tab = getTabValue(value)
+    setParams({
+      tab: tab !== defaultTab ? tab : null,
+      types: null,
+      p: null,
+    })
+  }
 
   async function initData() {
     if (!id) {
@@ -86,8 +112,8 @@ export default function AuthorPage() {
   function toRow(element: Record<string, any>, index: number, limit: number, page: number) {
     return (
       <Table.Tr key={element.id}>
-        <Table.Td ta="right">
-          <Text size="sm">{(index + 1) + (limit * (page - 1))}</Text>
+        <Table.Td ta='right'>
+          <Text size='sm'>{(index + 1) + (limit * (page - 1))}</Text>
         </Table.Td>
 
         <Table.Td >
@@ -97,18 +123,18 @@ export default function AuthorPage() {
                 element.channel_thumbnail_url &&
                 <Image
                   src={element.channel_thumbnail_url}
-                  referrerPolicy="no-referrer"
-                  radius="sm"
+                  referrerPolicy='no-referrer'
+                  radius='sm'
                   w={40}
                   h={40}
                 />
               }
 
               <Stack gap={2} flex={1}>
-                <Menu position="bottom-start">
+                <Menu position='bottom-start'>
                   <Menu.Target>
-                    <Anchor underline="never">
-                      <Text ta="justify">{element.channel_custom_url || element.channel_id}</Text>
+                    <Anchor underline='never'>
+                      <Text ta='justify'>{element.channel_custom_url || element.channel_id}</Text>
                     </Anchor>
                   </Menu.Target>
 
@@ -119,16 +145,16 @@ export default function AuthorPage() {
                     <MenuItemAppVideo id={element.channel_id} />
                     <MenuItemAppAuthorChat id={element.channel_id} />
                     <Menu.Divider />
-                    <MenuItemCopy value={element.channel_id} label="Copy ID" />
-                    {element.channel_custom_url && <MenuItemCopy value={element.channel_custom_url} label="Copy handle" />}
-                    <MenuItemCopy value={element.channel_name} label="Copy name" />
+                    <MenuItemCopy value={element.channel_id} label='Copy ID' />
+                    {element.channel_custom_url && <MenuItemCopy value={element.channel_custom_url} label='Copy handle' />}
+                    <MenuItemCopy value={element.channel_name} label='Copy name' />
                   </Menu.Dropdown>
                 </Menu>
 
-                <Menu position="bottom-start">
+                <Menu position='bottom-start'>
                   <Menu.Target>
-                    <Anchor underline="never">
-                      <Text ta="justify">{element.video_title}</Text>
+                    <Anchor underline='never'>
+                      <Text ta='justify'>{element.video_title}</Text>
                     </Anchor>
                   </Menu.Target>
 
@@ -138,15 +164,15 @@ export default function AuthorPage() {
                     <Menu.Divider />
                     <MenuItemAppSuperChat id={element.video_id} />
                     <Menu.Divider />
-                    <MenuItemCopy value={element.video_id} label="Copy ID" />
-                    <MenuItemCopy value={element.video_title} label="Copy title" />
+                    <MenuItemCopy value={element.video_id} label='Copy ID' />
+                    <MenuItemCopy value={element.video_title} label='Copy title' />
                   </Menu.Dropdown>
                 </Menu>
 
                 <DateTimeText
                   value={element.created_at}
-                  size="sm"
-                  menuPosition="bottom-start"
+                  size='sm'
+                  menuPosition='bottom-start'
                 />
               </Stack>
             </Group>
@@ -161,33 +187,50 @@ export default function AuthorPage() {
 
   return (
     <>
-      <Group gap="sm" ml={8} mt={8}>
+      <Group gap='sm' ml={8} mt={8}>
         <BackButton url={backUrl} />
         <YoutubeChannelButton id={id} />
         <Text>{author?.name}</Text>
       </Group>
 
-      <ChatActionTypeSelector
-        form={form}
-        apiPath={`authors/${id}/stats/types`}
-      />
+      <Tabs
+        value={activeTab}
+        variant='pills'
+        onChange={onTabChange}
+      >
+        <Tabs.List ml={8} mb={16}>
+          <Tabs.Tab value='sc'>
+            SuperChat & Membership
+          </Tabs.Tab>
+          <Tabs.Tab value='msg'>
+            Messages
+          </Tabs.Tab>
+        </Tabs.List>
 
-      <ChatColorSelector
-        apiPath={`authors/${id}/stats/colors`}
-      />
+        <Tabs.Panel value='sc'>
+          <SuperChatRenderer
+            listApiPath={`authors/${id}/schats`}
+            listApiParams={{ types: form.getTransformedValues() }}
+            statsTypesApiPath={`authors/${id}/stats/types`}
+            statsColorsApiPath={`authors/${id}/stats/colors`}
+            form={form}
+            limit={cfg.author.chat.limit}
+            pollInterval={pollInterval}
+            toRow={toRow}
+          >
+          </SuperChatRenderer>
+        </Tabs.Panel>
 
-      <PaginationTable
-        apiPath={`authors/${id}/chats`}
-        apiParams={{ types: form.getTransformedValues() }}
-        limit={100}
-        thead={
-          <Table.Tr>
-            <Table.Th w={0} ta="center">#</Table.Th>
-            <Table.Th />
-          </Table.Tr>
-        }
-        toRow={toRow}
-      />
+        <Tabs.Panel value='msg'>
+          <CommonChatRenderer
+            listApiPath={`authors/${id}/chats`}
+            limit={cfg.author.chat.limit}
+            pollInterval={pollInterval}
+            toRow={toRow}
+          >
+          </CommonChatRenderer>
+        </Tabs.Panel>
+      </Tabs>
     </>
   )
 }

@@ -3,7 +3,7 @@ import { IconCheck, IconQuestionMark, IconX } from '@tabler/icons-react'
 export function IconBoolean(props: { value: boolean, size?: number, nullable?: boolean }) {
   if (props.nullable && typeof props.value !== 'boolean') {
     return (
-      <IconQuestionMark size={props.size} color="yellow" />
+      <IconQuestionMark size={props.size} color='yellow' />
     )
   }
 
@@ -11,8 +11,8 @@ export function IconBoolean(props: { value: boolean, size?: number, nullable?: b
     <>
       {
         props.value
-          ? <IconCheck size={props.size} color="lime" />
-          : <IconX size={props.size} color="red" />
+          ? <IconCheck size={props.size} color='lime' />
+          : <IconX size={props.size} color='red' />
       }
     </>
   )

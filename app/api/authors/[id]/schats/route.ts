@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getAuthorBaseChats } from '../../../../../src/repository/author.repository'
+import { getAuthorSuperChats } from '../../../../../src/repository/author.repository'
 import { RequestUtil } from '../../../../../src/util/request.util'
 
 export async function GET(
@@ -8,8 +8,9 @@ export async function GET(
 ) {
   const { id } = await params
   const { searchParams } = request.nextUrl
-  const res = await getAuthorBaseChats(id, {
+  const res = await getAuthorSuperChats(id, {
     ...RequestUtil.parsePaginationParams(searchParams),
+    types: RequestUtil.parseChatActionTypes(searchParams),
   })
   return NextResponse.json(res)
 }

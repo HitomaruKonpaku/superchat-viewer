@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation'
 import { db, pool } from '../db'
 import { IPagination } from '../interface/pagination.interface'
 
-export async function getAuthorChats(
+export async function getAuthorSuperChats(
   authorId: string,
   opts: IPagination & {
     types: string[]
@@ -58,12 +58,86 @@ END
     .addSelect('yc.name', 'channel_name')
     .addSelect('yc.thumbnail_url', 'channel_thumbnail_url')
     .leftJoinAndSelect('youtube_channel', 'yc', 'yc.id = yv.channel_id')
-    .addOrderBy('yca."created_at"')
+    .addOrderBy('yca."created_at"', 'DESC')
     .limit(opts.limit)
     .offset(opts.offset)
 
   const { rows } = await pool.query(...queryItem.getQueryAndParameters())
   return { total: Number(count), items: rows }
+}
+
+export async function getAuthorBaseChats(
+  authorId: string,
+  opts: IPagination,
+) {
+  'use cache'
+  cacheLife('minutes')
+
+  if (!authorId) {
+    throw new Error('AUTHOR_ID_NOT_FOUND')
+  }
+
+  const types = [
+    'addChatItemAction',
+    // 'addSuperChatItemAction',
+  ]
+
+  const createChatQueryBuilder = (tableName: string) => db.createQueryBuilder()
+    .from(tableName, 'yca')
+    .andWhere('author_channel_id = :authorId', { authorId })
+    .andWhere('type IN (:...types)', { types })
+    .select('id')
+    .addSelect('created_at')
+    .addSelect('video_id')
+    .addSelect('author_channel_id')
+    .addSelect('author_name')
+    .addSelect('author_photo')
+    .addSelect('is_owner')
+    .addSelect('is_moderator')
+    .addSelect('is_verified')
+    .addSelect('message')
+
+  const queryItem = db.createQueryBuilder()
+    .addCommonTableExpression(
+      createChatQueryBuilder('youtube_chat_action'),
+      'yca_1',
+    )
+    .addCommonTableExpression(
+      createChatQueryBuilder('youtube_chat_action_chat'),
+      'yca_2',
+    )
+    .addCommonTableExpression(
+      '(SELECT * FROM yca_1) UNION ALL (SELECT * FROM yca_2)',
+      'yca',
+    )
+    .addCommonTableExpression(
+      'SELECT COUNT(*) AS _total FROM yca',
+      'total',
+    )
+    .from('yca', 'yca')
+    .select('yca.*')
+    .addSelect('yv.title', 'video_title')
+    .addSelect('yc.id', 'channel_id')
+    .addSelect('yc.custom_url', 'channel_custom_url')
+    .addSelect('yc.name', 'channel_name')
+    .addSelect('yc.thumbnail_url', 'channel_thumbnail_url')
+    .addSelect('tt.*')
+    .leftJoin('youtube_video', 'yv', 'yv.id = yca.video_id')
+    .leftJoin('youtube_channel', 'yc', 'yc.id = yv.channel_id')
+    .leftJoin('total', 'tt', 'TRUE')
+    .addOrderBy('yca."created_at"', 'DESC')
+    .limit(opts.limit)
+    .offset(opts.offset)
+
+  const { rows } = await pool.query(...queryItem.getQueryAndParameters())
+  let total = 0
+  const items = rows.map((v) => {
+    v.created_at = Number(v.created_at)
+    total = total || Number(v._total)
+    delete v._total
+    return v
+  })
+  return { total, items }
 }
 
 export async function getAuthorById(id: string) {

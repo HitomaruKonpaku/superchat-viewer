@@ -2,6 +2,7 @@
 
 import { Anchor, Center, Group, Image, Menu, Stack, Table, Text } from '@mantine/core'
 import ms from 'ms'
+import { useState } from 'react'
 import { DateTimeText } from '../../components/DateTimeText/DateTimeText'
 import PaginationTable from '../../components/PaginationTable/PaginationTable'
 import { IconBoolean } from '../../components/icon/IconBoolean'
@@ -10,15 +11,16 @@ import MenuItemAppChannel from '../../components/menu-item/MenuItemAppChannel'
 import MenuItemCopy from '../../components/menu-item/MenuItemCopy'
 import MenuItemHolodexChannel from '../../components/menu-item/MenuItemHolodexChannel'
 import MenuItemYoutubeChannel from '../../components/menu-item/MenuItemYoutubeChannel'
+import { cfg } from '../../src/cfg'
 
 export default function ChannelListPage() {
-  const pollInterval = ms('60s')
+  const [pollInterval] = useState(ms('60s'))
 
   function toRow(element: Record<string, any>, index: number, limit: number, page: number) {
     return (
       <Table.Tr key={element.id}>
-        <Table.Td ta="right">
-          <Text size="sm">{(index + 1) + (limit * (page - 1))}</Text>
+        <Table.Td ta='right'>
+          <Text size='sm'>{(index + 1) + (limit * (page - 1))}</Text>
         </Table.Td>
 
         <Table.Td p={0}>
@@ -26,8 +28,8 @@ export default function ChannelListPage() {
             <Center>
               <Image
                 src={element.thumbnail_url}
-                referrerPolicy="no-referrer"
-                radius="sm"
+                referrerPolicy='no-referrer'
+                radius='sm'
                 w={100}
                 h={100}
               />
@@ -37,20 +39,20 @@ export default function ChannelListPage() {
 
         <Table.Td>
           <Stack gap={4}>
-            <Menu position="bottom-start">
+            <Menu position='bottom-start'>
               <Menu.Target>
                 <Stack gap={4}>
-                  <Anchor underline="never">
-                    <Text size="sm" ta="justify">{element.id}</Text>
+                  <Anchor underline='never'>
+                    <Text size='sm' ta='justify'>{element.id}</Text>
                   </Anchor>
                   {
                     element.custom_url &&
-                    <Anchor underline="never">
-                      <Text size="sm" ta="justify">{element.custom_url}</Text>
+                    <Anchor underline='never'>
+                      <Text size='sm' ta='justify'>{element.custom_url}</Text>
                     </Anchor>
                   }
-                  <Anchor underline="never">
-                    <Text size="sm" ta="justify">{element.name}</Text>
+                  <Anchor underline='never'>
+                    <Text size='sm' ta='justify'>{element.name}</Text>
                   </Anchor>
                 </Stack>
               </Menu.Target>
@@ -62,18 +64,18 @@ export default function ChannelListPage() {
                 <MenuItemAppChannel id={element.id} />
                 <MenuItemAppAuthorChat id={element.id} />
                 <Menu.Divider />
-                <MenuItemCopy value={element.id} label="Copy ID" />
-                {element.custom_url && <MenuItemCopy value={element.custom_url} label="Copy handle" />}
-                <MenuItemCopy value={element.name} label="Copy name" />
+                <MenuItemCopy value={element.id} label='Copy ID' />
+                {element.custom_url && <MenuItemCopy value={element.custom_url} label='Copy handle' />}
+                <MenuItemCopy value={element.name} label='Copy name' />
               </Menu.Dropdown>
             </Menu>
 
-            <Menu position="bottom-start">
+            <Menu position='bottom-start'>
               <Menu.Target>
                 <Group>
                   <IconBoolean value={element.is_active} size={16} nullable />
                   <IconBoolean value={element.has_membership} size={16} nullable />
-                  <Text size="sm" ta="right" w={40}>{element.video_count}</Text>
+                  <Text size='sm' ta='right' w={40}>{element.video_count}</Text>
                 </Group>
               </Menu.Target>
 
@@ -92,8 +94,8 @@ export default function ChannelListPage() {
 
             <DateTimeText
               value={element.created_at}
-              size="sm"
-              menuPosition="bottom-start"
+              size='sm'
+              menuPosition='bottom-start'
             />
           </Stack>
         </Table.Td>
@@ -104,13 +106,13 @@ export default function ChannelListPage() {
   return (
     <>
       <PaginationTable
-        apiPath="channels"
-        limit={25}
+        apiPath='channels'
+        limit={cfg.channel.limit}
         pollInterval={pollInterval}
         search
         thead={
           <Table.Tr>
-            <Table.Th w={0} ta="center">#</Table.Th>
+            <Table.Th w={0} ta='center'>#</Table.Th>
             <Table.Th w={100} />
             <Table.Th />
           </Table.Tr>

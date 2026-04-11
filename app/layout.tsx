@@ -15,20 +15,20 @@ export const metadata = {
 
 export default function RootLayout({ children }: { children: any }) {
   return (
-    <html lang="en" {...mantineHtmlProps}>
+    <html lang='en' {...mantineHtmlProps}>
       <head>
         <ColorSchemeScript />
-        <link rel="shortcut icon" href="/favicon.svg" />
+        <link rel='shortcut icon' href='/favicon.svg' />
         <meta
-          name="viewport"
-          content="minimum-scale=1, initial-scale=1, width=device-width, user-scalable=no"
+          name='viewport'
+          content='minimum-scale=1, initial-scale=1, width=device-width, user-scalable=no'
         />
       </head>
 
       <body>
-        <MantineProvider theme={theme} defaultColorScheme="dark" forceColorScheme="dark">
+        <MantineProvider theme={theme} defaultColorScheme='dark' forceColorScheme='dark'>
           <LoadingProvider>
-            <Stack maw={1280} m="auto" mt={8}>
+            <Stack maw={1280} m='auto' mt={8}>
               <Suspense >
                 {children}
               </Suspense>

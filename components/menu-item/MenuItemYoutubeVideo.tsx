@@ -11,8 +11,8 @@ export default function MenuItemYoutubeVideo(props: IProps) {
   return (
     <Anchor
       href={VideoUtil.toUrl(props.id)}
-      target="_blank"
-      underline="never"
+      target='_blank'
+      underline='never'
     >
       <Menu.Item leftSection={<IconBrandYoutube size={14} />}>
         {props.label || 'Open video'}
