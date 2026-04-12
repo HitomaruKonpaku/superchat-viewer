@@ -1,7 +1,6 @@
 'use client'
 
 import { Anchor, Center, Group, Image, Menu, Stack, Table, Text, Tooltip } from '@mantine/core'
-import ms from 'ms'
 import { useParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { BackButton } from '../../../components/BackButton/BackButton'
@@ -20,7 +19,7 @@ import { cfg } from '../../../src/cfg'
 import { VideoUtil } from '../../../src/util/video.util'
 
 export default function ChannelPage() {
-  const pollInterval = ms('30s')
+  const [pollInterval] = useState(cfg.video.pollInterval)
   const id = useParams().id?.toString() as string
   const [backUrl] = useState('/channels')
   const [channel, setChannel] = useState<any>(null)

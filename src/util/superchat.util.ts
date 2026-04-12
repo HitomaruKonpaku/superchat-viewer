@@ -1,4 +1,4 @@
-import { ChatActionForm, ChatTypeOption } from '../interface/superchat.interface'
+import { ChatActionFormValue, ChatTypeOption } from '../interface/superchat.interface'
 
 export class SuperChatUtil {
   public static readonly OPTIONS: ChatTypeOption[] = [
@@ -47,11 +47,10 @@ export class SuperChatUtil {
     return mask
   }
 
-  public static getInitialValues(initValue?: string | null): ChatActionForm {
-    const defaultTypes = SuperChatUtil.getDefaultTypes()
-    const mask = initValue !== null
-      ? Number(initValue)
-      : defaultTypes
+  public static getInitialValues(initValue?: string | null): ChatActionFormValue {
+    const mask = [undefined, null, ''].includes(initValue)
+      ? SuperChatUtil.getDefaultTypes()
+      : Number(initValue)
     const types = SuperChatUtil.OPTIONS.map(option => ({
       ...option,
       checked: !!(mask & (1 << option.id))
@@ -59,12 +58,12 @@ export class SuperChatUtil {
     return { types }
   }
 
-  public static getTransformValues(values: ChatActionForm) {
+  public static getTransformValues(values: ChatActionFormValue) {
     const res = values.types.filter(v => v.checked).map(v => v.key).join(',')
     return res
   }
 
-  public static getTypesParam(values: ChatActionForm): string {
+  public static getTypesParam(values: ChatActionFormValue): string {
     const defaultTypes = SuperChatUtil.getDefaultTypes()
     const mask = SuperChatUtil.getTypes(values.types) ?? defaultTypes
     if (mask === defaultTypes) {

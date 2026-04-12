@@ -2,10 +2,9 @@
 
 import { Anchor, Divider, Group, Image, Menu, Stack, Table, Text, Tooltip } from '@mantine/core'
 import { useForm } from '@mantine/form'
-import { useMounted } from '@mantine/hooks'
 import { IconStarFilled } from '@tabler/icons-react'
-import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { useCallback, useEffect, useState } from 'react'
+import { useParams } from 'next/navigation'
+import { useContext, useEffect, useState } from 'react'
 import { BackButton } from '../../../components/BackButton/BackButton'
 import { ChatActionRenderer } from '../../../components/ChatAction/ChatActionRenderer'
 import { SuperChatRenderer } from '../../../components/ChatRenderer/SuperChatRenderer'
@@ -18,13 +17,11 @@ import MenuItemYoutubeChannel from '../../../components/menu-item/MenuItemYoutub
 import { YoutubeVideoButton } from '../../../components/YoutubeVideoButton/YoutubeVideoButton'
 import { api } from '../../../src/api'
 import { cfg } from '../../../src/cfg'
+import { SearchParamsContext } from '../../../src/provider/search-params.provider'
 import { SuperChatUtil } from '../../../src/util/superchat.util'
 
 export default function SuperChatPage() {
-  const router = useRouter()
-  const pathname = usePathname()
-  const searchParams = useSearchParams()
-  const mounted = useMounted()
+  const { searchParams, applyParams } = useContext(SearchParamsContext)
 
   const [backUrl, setBackUrl] = useState('/channels')
   const [pollInterval, setPollInterval] = useState(cfg.superchat.pollInterval)
@@ -35,39 +32,17 @@ export default function SuperChatPage() {
     mode: 'uncontrolled',
     initialValues: SuperChatUtil.getInitialValues(searchParams.get('types')),
     transformValues: SuperChatUtil.getTransformValues,
+    onValuesChange: (value) => {
+      const newTypes = SuperChatUtil.getTypesParam(value)
+      applyParams({ types: newTypes, p: null })
+    },
   })
 
-  const createQueryString = useCallback(
-    (newParams: Record<string, string | undefined | null>) => {
-      const params = new URLSearchParams(searchParams.toString())
-      Object.keys(newParams).forEach((key) => {
-        const value = newParams[key]
-        if (value === undefined || value === null || value === '') {
-          params.delete(key)
-        } else {
-          params.set(key, value)
-        }
-      })
-      return params.toString()
-    },
-    [searchParams]
-  )
-
-  const setParams = (params: Record<string, any | undefined | null>) => {
-    const qs = createQueryString(params)
-    const href = `${pathname}?${qs}`
-    router.push(href)
-  }
+  //#region data
 
   useEffect(() => {
     initData()
   }, [])
-
-  useEffect(() => {
-    if (!mounted) { return }
-    const types = SuperChatUtil.getTypesParam(form.values)
-    setParams({ types, p: null })
-  }, [form.values])
 
   async function initData() {
     const url = `videos/${id}`
@@ -83,6 +58,8 @@ export default function SuperChatPage() {
       console.warn(error.message)
     }
   }
+
+  //#endregion
 
   function toRow(element: Record<string, any>, index: number, limit: number, page: number) {
     return (

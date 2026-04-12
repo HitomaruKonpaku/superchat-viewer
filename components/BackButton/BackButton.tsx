@@ -3,11 +3,16 @@
 import { ActionIcon, Tooltip } from '@mantine/core'
 import { IconArrowBack } from '@tabler/icons-react'
 import { useRouter } from 'next/navigation'
+import { useContext } from 'react'
+import { SearchParamsContext } from '../../src/provider/search-params.provider'
 
 export function BackButton({ url, defaultUrl }: { url?: string, defaultUrl?: string }) {
   const router = useRouter()
+  const { clearParams: clearParams } = useContext(SearchParamsContext)
 
   function onClick() {
+    clearParams()
+
     if (url) {
       router.push(url)
       return

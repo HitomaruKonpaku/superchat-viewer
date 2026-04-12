@@ -1,13 +1,13 @@
 import { Checkbox, Flex } from '@mantine/core'
 import { UseFormReturnType } from '@mantine/form'
 import { useMounted } from '@mantine/hooks'
-import { BaseSyntheticEvent, useContext, useEffect, useState } from 'react'
+import { BaseSyntheticEvent, useContext, useEffect, useRef } from 'react'
 import { api } from '../../src/api'
-import { ChatActionForm, ChatTypeOption } from '../../src/interface/superchat.interface'
+import { ChatActionFormValue, ChatTypeOption } from '../../src/interface/superchat.interface'
 import { LoadingContext } from '../../src/provider/loading.provider'
 
 interface IProps {
-  form?: UseFormReturnType<ChatActionForm, string>
+  form?: UseFormReturnType<ChatActionFormValue, string>
   apiPath?: string
   pollInterval?: number
 }
@@ -16,8 +16,9 @@ export function ChatActionTypeSelector(props: IProps) {
   const mounted = useMounted()
   const { loading } = useContext(LoadingContext)
 
-  const [timerId, setTimerId] = useState<any>()
-  const [abortController, setAbortController] = useState<AbortController>()
+  const timerRef = useRef<any>(null)
+  const timerDelayRef = useRef(props.pollInterval)
+  const abortControllerRef = useRef<AbortController | null>(null)
 
   const types = props.form?.values?.types || []
 
@@ -28,67 +29,75 @@ export function ChatActionTypeSelector(props: IProps) {
 
   useEffect(() => {
     return () => {
-      clearInterval(timerId)
-      abortController?.abort()
+      clearTimeout(timerRef.current)
+      abortControllerRef.current?.abort()
     }
   }, [])
 
   useEffect(() => {
-    if (!mounted) { return }
+    timerDelayRef.current = props.pollInterval
+  }, [props.pollInterval])
+
+  useEffect(() => {
+    if (!mounted) return
     init()
-  }, [mounted, props.pollInterval])
+  }, [mounted])
+
+  useEffect(() => {
+    if (!timerDelayRef.current) {
+      clearTimeout(timerRef.current)
+      return
+    }
+    initTimer()
+  }, [timerDelayRef.current])
 
   async function init() {
-    clearInterval(timerId)
     return initData()
       .finally(() => initTimer())
   }
 
   function initTimer() {
-    clearInterval(timerId)
+    clearTimeout(timerRef.current)
     if (!props.pollInterval) {
       return
     }
 
-    setTimerId(setTimeout(
+    timerRef.current = setTimeout(
       () => {
         initData()
           .finally(() => initTimer())
       },
       props.pollInterval,
-    ))
+    )
   }
 
   async function initData() {
+    clearTimeout(timerRef.current)
     if (!props.form) {
       return
     }
 
     try {
       const res = await fetchData()
-      const curTypes = props.form.values.types || []
-      const newTypes = curTypes.map((type) => {
-        const obj = res.items.find((v: any) => v.type === type.key)
-        const newCount = obj?.count ?? type.count
-        return {
-          ...type,
-          count: newCount,
-        }
+      const items = props.form.values.types || []
+      items.forEach((item) => {
+        const obj = res.items.find((v: any) => v.type === item.key)
+        const newCount = obj?.count ?? item.count
+        item.count = newCount
       })
-      props.form.setFieldValue('types', newTypes)
     } finally {
       // ignore
     }
   }
 
   async function fetchData() {
-    abortController?.abort()
+    abortControllerRef.current?.abort()
     if (!props.apiPath) {
       return { total: 0, items: [] }
     }
 
     const controller = new AbortController()
-    setAbortController(controller)
+    abortControllerRef.current = controller
     const { data: { total, items } } = await api.get(
       props.apiPath,
       {

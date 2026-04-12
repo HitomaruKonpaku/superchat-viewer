@@ -4,11 +4,11 @@ import { Button, Flex, Grid, Group, Input, Pagination, Table } from '@mantine/co
 import { useForm } from '@mantine/form'
 import { useHotkeys, useMounted } from '@mantine/hooks'
 import { IconSearch, IconX } from '@tabler/icons-react'
-import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { BaseSyntheticEvent, JSX, useCallback, useContext, useEffect, useRef, useState } from 'react'
+import { BaseSyntheticEvent, JSX, useContext, useEffect, useRef, useState } from 'react'
 import { api } from '../../src/api'
 import { cfg } from '../../src/cfg'
 import { LoadingContext } from '../../src/provider/loading.provider'
+import { SearchParamsContext } from '../../src/provider/search-params.provider'
 
 interface IProps {
   apiPath: string
@@ -27,22 +27,23 @@ interface IProps {
 }
 
 export default function PaginationTable(props: IProps) {
-  const router = useRouter()
-  const pathname = usePathname()
-  const searchParams = useSearchParams()
   const mounted = useMounted()
   const { setLoading } = useContext(LoadingContext)
+  const { searchParams, applyParams, qs } = useContext(SearchParamsContext)
+
+  const timerRef = useRef<any>(null)
+  const timerDelayRef = useRef(props.pollInterval)
+  const abortControllerRef = useRef<AbortController | null>(null)
 
   const [rows, setRows] = useState<any[]>([])
+  const [query, setQuery] = useState('')
   const [limit, setLimit] = useState(cfg.defaultValue.limit)
   const [pageValue, setPageValue] = useState(cfg.defaultValue.page)
   const [pageTotal, setPageTotal] = useState(1)
-  const [query, setQuery] = useState('')
 
-  const [timerId, setTimerId] = useState<any>()
-  const [abortController, setAbortController] = useState<AbortController>()
-
-  const [isPageChanged, setIsPageChanged] = useState(false)
+  const queryRef = useRef(query)
+  const limitRef = useRef(limit)
+  const pageValueRef = useRef(pageValue)
 
   const searchRef = useRef<HTMLInputElement>(null)
   const searchForm = useForm({
@@ -52,90 +53,92 @@ export default function PaginationTable(props: IProps) {
     }
   })
 
-  const createQueryString = useCallback(
-    (newParams: Record<string, string | undefined | null>) => {
-      const params = new URLSearchParams(searchParams.toString())
-      Object.keys(newParams).forEach((key) => {
-        const value = newParams[key]
-        if (value === undefined || value === null || value === '') {
-          params.delete(key)
-        } else {
-          params.set(key, value)
-        }
-      })
-      return params.toString()
-    },
-    [searchParams]
-  )
-
-  const setParams = (params: Record<string, any | undefined | null>) => {
-    const qs = createQueryString(params)
-    const href = `${pathname}?${qs}`
-    router.push(href)
-  }
-
   useEffect(() => {
+    setQuery(searchParams.get('q') || query)
+    setLimit(Number(searchParams.get('l') || props.limit || limit))
+    setPageValue(Number(searchParams.get('p') || props.page || pageValue))
+
     return () => {
-      clearInterval(timerId)
-      abortController?.abort()
+      clearTimeout(timerRef.current)
+      abortControllerRef.current?.abort()
     }
   }, [])
 
   useEffect(() => {
-    if (!mounted) { return }
-    setLimit(Number(searchParams.get('l')) || props.limit || cfg.defaultValue.limit)
-    setPageValue(Number(searchParams.get('p')) || props.page || cfg.defaultValue.page)
-    setQuery(searchParams.get('q') || '')
-    setPageTotal(1)
-    init()
-  }, [mounted])
+    timerDelayRef.current = props.pollInterval
+  }, [props.pollInterval])
 
   useEffect(() => {
-    setLimit(Number(searchParams.get('l')) || props.limit || cfg.defaultValue.limit)
-    setPageValue(Number(searchParams.get('p')) || props.page || cfg.defaultValue.page)
-    setQuery(searchParams.get('q') || '')
-    if (!mounted) { return }
+    queryRef.current = query
+  }, [query])
+
+  useEffect(() => {
+    limitRef.current = limit
+  }, [limit])
+
+  useEffect(() => {
+    pageValueRef.current = pageValue
+  }, [pageValue])
+
+  useEffect(() => {
+    if (!mounted) return
+
+    if (!searchParams.get('l')) {
+      limitRef.current = props.limit ?? cfg.defaultValue.limit
+      setLimit(limitRef.current)
+    }
+
+    if (!searchParams.get('p')) {
+      pageValueRef.current = cfg.defaultValue.page
+      setPageValue(pageValueRef.current)
+    }
+
     init()
-  }, [searchParams])
+  }, [mounted, qs()])
+
+  useEffect(() => {
+    if (!timerDelayRef.current) {
+      clearTimeout(timerRef.current)
+      return
+    }
+    initTimer()
+  }, [timerDelayRef.current])
 
   useHotkeys([
-    ['ArrowLeft', () => {
-      onPageChange(Math.max(cfg.defaultValue.page, pageValue - 1))
-    }],
-    ['ArrowRight', () => {
-      onPageChange(Math.min(pageTotal, pageValue + 1))
-    }],
+    ['ArrowLeft', toPrevPage],
+    ['ArrowRight', toNextPage],
+    ['a', toPrevPage],
+    ['d', toNextPage],
+    ['ctrl+f', focusSearch],
   ])
 
   async function init() {
-    clearInterval(timerId)
     return initData()
       .then(() => {
-        if (isPageChanged) {
-          setIsPageChanged(false)
-          window.scrollTo({ top: 0, behavior: 'smooth' })
-        }
+        window.scrollTo({ top: 0, behavior: 'smooth' })
       })
       .finally(() => initTimer())
   }
 
   function initTimer() {
-    clearInterval(timerId)
-    if (!props.pollInterval) {
+    clearTimeout(timerRef.current)
+    if (!timerDelayRef.current) {
       return
     }
 
-    setTimerId(setTimeout(
+    timerRef.current = setTimeout(
       () => {
         initData()
           .finally(() => initTimer())
       },
-      props.pollInterval,
-    ))
+      timerDelayRef.current,
+    )
   }
 
   async function initData() {
+    clearTimeout(timerRef.current)
     setLoading(true)
+
     try {
       const { total, items } = await fetchData()
       setRows(items.map((item: any, index: number) => props.toRow?.(item, index, limit, pageValue)))
@@ -146,24 +149,19 @@ export default function PaginationTable(props: IProps) {
   }
 
   async function fetchData() {
-    abortController?.abort()
+    abortControllerRef.current?.abort()
     if (!props.apiPath) {
       return { total: 0, items: [] }
     }
 
     const params = {
       ...props.apiParams,
-      limit,
-      page: pageValue,
-      q: query,
+      q: queryRef.current,
+      limit: limitRef.current,
+      page: pageValueRef.current,
     }
     const controller = new AbortController()
-    setAbortController(controller)
-
-    if (cfg.debug) {
-      console.warn('fetchData', { url: props.apiPath, params })
-    }
-
+    abortControllerRef.current = controller
     const { data: { total, items } } = await api.get(
       props.apiPath,
       {
@@ -174,11 +172,7 @@ export default function PaginationTable(props: IProps) {
     return { total, items }
   }
 
-  function onPageChange(value: number) {
-    setIsPageChanged(true)
-    setPageValue(value)
-    setParams({ p: value !== 1 ? value : null })
-  }
+  //#region search
 
   function onSearchKeyDown(event: BaseSyntheticEvent<KeyboardEvent>) {
     if (event.nativeEvent.code === 'Escape') {
@@ -189,17 +183,40 @@ export default function PaginationTable(props: IProps) {
   }
 
   function onSearch(values: typeof searchForm.values) {
-    setPageValue(1)
     setQuery(values.search)
-    setParams({ q: values.search, p: null })
+    setPageValue(1)
+    applyParams({ q: values.search, p: null })
   }
 
   function clearSearch() {
-    setPageValue(1)
     setQuery('')
-    setParams({ q: null, p: null })
+    setPageValue(1)
+    applyParams({ q: null, p: null })
     searchForm.setValues({ search: '' })
+    focusSearch()
+  }
+
+  function focusSearch() {
     setTimeout(() => searchRef?.current?.focus())
+  }
+
+  //#endregion
+
+  //#region pagination
+
+  function onPageChange(value: number) {
+    setPageValue(value)
+    applyParams({ p: value !== 1 ? value : null })
+  }
+
+  function toPrevPage() {
+    const page = Math.max(cfg.defaultValue.page, pageValue - 1)
+    onPageChange(page)
+  }
+
+  function toNextPage() {
+    const page = Math.min(pageTotal, pageValue + 1)
+    onPageChange(page)
   }
 
   function getPagination() {
@@ -213,6 +230,8 @@ export default function PaginationTable(props: IProps) {
       />
     )
   }
+
+  //#endregion
 
   return (
     <>

@@ -6,6 +6,6 @@ export interface ChatTypeOption {
   count: number
 }
 
-export interface ChatActionForm {
+export interface ChatActionFormValue {
   types: ChatTypeOption[]
 }

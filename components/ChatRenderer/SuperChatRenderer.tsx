@@ -3,7 +3,7 @@
 import { Stack, Table } from '@mantine/core'
 import { UseFormReturnType } from '@mantine/form'
 import { JSX } from 'react'
-import { ChatActionForm } from '../../src/interface/superchat.interface'
+import { ChatActionFormValue } from '../../src/interface/superchat.interface'
 import { ChatActionTypeSelector } from '../ChatAction/ChatActionTypeSelector'
 import { ChatColorSelector } from '../ChatColor/ChatColorSelector'
 import PaginationTable from '../PaginationTable/PaginationTable'
@@ -13,7 +13,7 @@ interface IProps {
   listApiParams?: Record<string, any>
   statsTypesApiPath?: string
   statsColorsApiPath?: string
-  form: UseFormReturnType<ChatActionForm, string>
+  form: UseFormReturnType<ChatActionFormValue, string>
   limit?: number
   pollInterval?: number
   toRow: (element: Record<string, any>, index: number, limit: number, page: number) => JSX.Element

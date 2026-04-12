@@ -2,9 +2,8 @@
 
 import { Anchor, Divider, Group, Image, Menu, Stack, Table, Tabs, Text } from '@mantine/core'
 import { useForm } from '@mantine/form'
-import { useMounted } from '@mantine/hooks'
-import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { useCallback, useEffect, useState } from 'react'
+import { useParams } from 'next/navigation'
+import { useContext, useEffect, useState } from 'react'
 import { BackButton } from '../../../components/BackButton/BackButton'
 import { ChatActionRenderer } from '../../../components/ChatAction/ChatActionRenderer'
 import { CommonChatRenderer } from '../../../components/ChatRenderer/CommonChatRenderer'
@@ -21,13 +20,11 @@ import MenuItemYoutubeVideo from '../../../components/menu-item/MenuItemYoutubeV
 import { YoutubeChannelButton } from '../../../components/YoutubeChannelButton/YoutubeChannelButton'
 import { api } from '../../../src/api'
 import { cfg } from '../../../src/cfg'
+import { SearchParamsContext } from '../../../src/provider/search-params.provider'
 import { SuperChatUtil } from '../../../src/util/superchat.util'
 
 export default function AuthorPage() {
-  const router = useRouter()
-  const pathname = usePathname()
-  const searchParams = useSearchParams()
-  const mounted = useMounted()
+  const { searchParams, applyParams } = useContext(SearchParamsContext)
 
   const [backUrl] = useState('/channels')
   const [pollInterval] = useState(cfg.author.chat.pollInterval)
@@ -41,57 +38,17 @@ export default function AuthorPage() {
     mode: 'uncontrolled',
     initialValues: SuperChatUtil.getInitialValues(searchParams.get('types')),
     transformValues: SuperChatUtil.getTransformValues,
+    onValuesChange: (value) => {
+      const newTypes = SuperChatUtil.getTypesParam(value)
+      applyParams({ types: newTypes, p: null })
+    },
   })
 
-  const createQueryString = useCallback(
-    (newParams: Record<string, string | undefined | null>) => {
-      const params = new URLSearchParams(searchParams.toString())
-      Object.keys(newParams).forEach((key) => {
-        const value = newParams[key]
-        if (value === undefined || value === null || value === '') {
-          params.delete(key)
-        } else {
-          params.set(key, value)
-        }
-      })
-      return params.toString()
-    },
-    [searchParams]
-  )
-
-  const setParams = (params: Record<string, any | undefined | null>) => {
-    const qs = createQueryString(params)
-    const href = `${pathname}?${qs}`
-    router.push(href)
-  }
+  //#region data
 
   useEffect(() => {
     initData()
   }, [])
-
-  useEffect(() => {
-    if (!mounted) { return }
-    const types = SuperChatUtil.getTypesParam(form.values)
-    setParams({ types, p: null })
-  }, [form.values])
-
-  useEffect(() => {
-    const tab = searchParams.get('tab')
-    setActiveTab(tab || defaultTab)
-  }, [searchParams])
-
-  function getTabValue(value: string | null) {
-    return value ?? defaultTab
-  }
-
-  function onTabChange(value: string | null) {
-    const tab = getTabValue(value)
-    setParams({
-      tab: tab !== defaultTab ? tab : null,
-      types: null,
-      p: null,
-    })
-  }
 
   async function initData() {
     if (!id) {
@@ -107,6 +64,30 @@ export default function AuthorPage() {
       console.warn(error.message)
     }
   }
+
+  //#endregion
+
+  //#region tab
+
+  useEffect(() => {
+    const tab = searchParams.get('tab')
+    setActiveTab(tab || defaultTab)
+  }, [searchParams.get('tab')])
+
+  function getTabValue(value: string | null) {
+    return value ?? defaultTab
+  }
+
+  function onTabChange(value: string | null) {
+    const tab = getTabValue(value)
+    applyParams({
+      tab: tab !== defaultTab ? tab : null,
+      types: null,
+      p: null,
+    })
+  }
+
+  //#endregion
 
   function toRow(element: Record<string, any>, index: number, limit: number, page: number) {
     return (

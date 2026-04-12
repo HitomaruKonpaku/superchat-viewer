@@ -4,6 +4,7 @@ import { ColorSchemeScript, mantineHtmlProps, MantineProvider, Stack } from '@ma
 import { Suspense } from 'react'
 import { Scroller } from '../components/Scroller/Scroller'
 import { LoadingProvider } from '../src/provider/loading.provider'
+import { SearchParamsProvider } from '../src/provider/search-params.provider'
 import { theme } from '../theme'
 
 export const metadata = {
@@ -28,11 +29,13 @@ export default function RootLayout({ children }: { children: any }) {
       <body>
         <MantineProvider theme={theme} defaultColorScheme='dark' forceColorScheme='dark'>
           <LoadingProvider>
-            <Stack maw={1280} m='auto' mt={8}>
-              <Suspense >
-                {children}
-              </Suspense>
-            </Stack>
+            <SearchParamsProvider>
+              <Stack maw={1280} m='auto' mt={8}>
+                <Suspense >
+                  {children}
+                </Suspense>
+              </Stack>
+            </SearchParamsProvider>
           </LoadingProvider>
           <Scroller />
         </MantineProvider>

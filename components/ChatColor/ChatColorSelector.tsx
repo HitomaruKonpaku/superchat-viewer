@@ -1,6 +1,6 @@
 import { Divider, Flex, Text, Tooltip } from '@mantine/core'
 import { useMounted } from '@mantine/hooks'
-import { Fragment, useEffect, useState } from 'react'
+import { Fragment, useEffect, useRef, useState } from 'react'
 import { api } from '../../src/api'
 import { ColorUtil } from '../../src/util/color.util'
 import { EmojiUtil } from '../../src/util/emoji.util'
@@ -13,6 +13,10 @@ interface IProps {
 export function ChatColorSelector(props: IProps) {
   const mounted = useMounted()
 
+  const timerRef = useRef<any>(null)
+  const timerDelayRef = useRef(props.pollInterval)
+  const abortControllerRef = useRef<AbortController | null>(null)
+
   const [items, setItems] = useState<Record<string, number>>({
     1: 0,
     2: 0,
@@ -23,43 +27,53 @@ export function ChatColorSelector(props: IProps) {
     7: 0,
   })
 
-  const [timerId, setTimerId] = useState<any>()
-  const [abortController, setAbortController] = useState<AbortController>()
-
   useEffect(() => {
     return () => {
-      clearInterval(timerId)
-      abortController?.abort()
+      clearTimeout(timerRef.current)
+      abortControllerRef.current?.abort()
     }
   }, [])
 
   useEffect(() => {
-    if (!mounted) { return }
+    timerDelayRef.current = props.pollInterval
+  }, [props.pollInterval])
+
+  useEffect(() => {
+    if (!mounted) return
     init()
-  }, [mounted, props.pollInterval])
+  }, [mounted])
+
+  useEffect(() => {
+    if (!timerDelayRef.current) {
+      clearTimeout(timerRef.current)
+      return
+    }
+    initTimer()
+  }, [timerDelayRef.current])
 
   async function init() {
-    clearInterval(timerId)
     return initData()
       .finally(() => initTimer())
   }
 
   function initTimer() {
-    clearInterval(timerId)
+    clearTimeout(timerRef.current)
     if (!props.pollInterval) {
       return
     }
 
-    setTimerId(setTimeout(
+    timerRef.current = setTimeout(
       () => {
         initData()
           .finally(() => initTimer())
       },
       props.pollInterval,
-    ))
+    )
   }
 
   async function initData() {
+    clearTimeout(timerRef.current)
+
     try {
       const res = await fetchData()
       res.items.forEach((v: any) => {
@@ -72,13 +86,13 @@ export function ChatColorSelector(props: IProps) {
   }
 
   async function fetchData() {
-    abortController?.abort()
+    abortControllerRef.current?.abort()
     if (!props.apiPath) {
       return { total: 0, items: [] }
     }
 
     const controller = new AbortController()
-    setAbortController(controller)
+    abortControllerRef.current = controller
     const { data: { total, items } } = await api.get(
       props.apiPath,
       {
