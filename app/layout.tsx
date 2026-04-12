@@ -29,13 +29,13 @@ export default function RootLayout({ children }: { children: any }) {
       <body>
         <MantineProvider theme={theme} defaultColorScheme='dark' forceColorScheme='dark'>
           <LoadingProvider>
-            <SearchParamsProvider>
-              <Stack maw={1280} m='auto' mt={8}>
-                <Suspense >
+            <Suspense >
+              <SearchParamsProvider>
+                <Stack maw={1280} m='auto' mt={8}>
                   {children}
-                </Suspense>
-              </Stack>
-            </SearchParamsProvider>
+                </Stack>
+              </SearchParamsProvider>
+            </Suspense>
           </LoadingProvider>
           <Scroller />
         </MantineProvider>
