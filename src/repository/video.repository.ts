@@ -34,9 +34,8 @@ export async function getVideos(opts: IPagination & { channelId?: string }) {
     .addSelect('privacy_status')
     .addSelect('is_members_only')
     .addSelect('title')
-    // .addSelect('actual_start')
-    // .addSelect('actual_end')
     .addOrderBy('COALESCE(actual_start, created_at)', 'DESC', 'NULLS LAST')
+    .addOrderBy('modified_at', 'ASC', 'NULLS LAST')
     .limit(opts.limit)
     .offset(opts.offset)
 
