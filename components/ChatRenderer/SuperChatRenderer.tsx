@@ -13,7 +13,7 @@ interface IProps {
   listApiParams?: Record<string, any>
   statsTypesApiPath?: string
   statsColorsApiPath?: string
-  form: UseFormReturnType<ChatActionFormValue, string>
+  form: UseFormReturnType<ChatActionFormValue, Record<string, any>>
   limit?: number
   pollInterval?: number
   toRow: (element: Record<string, any>, index: number, limit: number, page: number) => JSX.Element

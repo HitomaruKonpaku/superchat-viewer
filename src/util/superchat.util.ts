@@ -1,4 +1,5 @@
 import { ChatActionFormValue, ChatTypeOption } from '../interface/superchat.interface'
+import { BitUtil } from './bit.util'
 
 export class SuperChatUtil {
   public static readonly OPTIONS: ChatTypeOption[] = [
@@ -59,16 +60,15 @@ export class SuperChatUtil {
   }
 
   public static getTransformValues(values: ChatActionFormValue) {
-    const res = values.types.filter(v => v.checked).map(v => v.key).join(',')
-    return res
+    const types = BitUtil.fromBoolsToNumber(values.types.map(v => v.checked).reverse())
+    return { types }
   }
 
-  public static getTypesParam(values: ChatActionFormValue): string {
+  public static getTypesParam(value: number): string {
     const defaultTypes = SuperChatUtil.getDefaultTypes()
-    const mask = SuperChatUtil.getTypes(values.types) ?? defaultTypes
-    if (mask === defaultTypes) {
+    if (value === defaultTypes) {
       return ''
     }
-    return String(mask)
+    return String(value)
   }
 }

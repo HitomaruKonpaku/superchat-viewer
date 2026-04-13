@@ -7,7 +7,7 @@ import { ChatActionFormValue, ChatTypeOption } from '../../src/interface/superch
 import { LoadingContext } from '../../src/provider/loading.provider'
 
 interface IProps {
-  form?: UseFormReturnType<ChatActionFormValue, string>
+  form?: UseFormReturnType<ChatActionFormValue, Record<string, any>>
   apiPath?: string
   pollInterval?: number
 }

@@ -18,6 +18,7 @@ import { YoutubeVideoButton } from '../../../components/YoutubeVideoButton/Youtu
 import { api } from '../../../src/api'
 import { cfg } from '../../../src/cfg'
 import { SearchParamsContext } from '../../../src/provider/search-params.provider'
+import { BitUtil } from '../../../src/util/bit.util'
 import { SuperChatUtil } from '../../../src/util/superchat.util'
 
 export default function SuperChatPage() {
@@ -33,8 +34,8 @@ export default function SuperChatPage() {
     initialValues: SuperChatUtil.getInitialValues(searchParams.get('types')),
     transformValues: SuperChatUtil.getTransformValues,
     onValuesChange: (value) => {
-      const newTypes = SuperChatUtil.getTypesParam(value)
-      applyParams({ types: newTypes, p: null })
+      const types = SuperChatUtil.getTypesParam(BitUtil.fromBoolsToNumber(value.types.map(v => v.checked).reverse()))
+      applyParams({ types, p: null })
     },
   })
 
@@ -131,7 +132,7 @@ export default function SuperChatPage() {
 
       <SuperChatRenderer
         listApiPath={`superchats/${id}`}
-        listApiParams={{ types: form.getTransformedValues() }}
+        listApiParams={{ ...form.getTransformedValues() }}
         statsTypesApiPath={`superchats/${id}/stats/types`}
         statsColorsApiPath={`superchats/${id}/stats/colors`}
         form={form}

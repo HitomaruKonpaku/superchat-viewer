@@ -21,6 +21,7 @@ import { YoutubeChannelButton } from '../../../components/YoutubeChannelButton/Y
 import { api } from '../../../src/api'
 import { cfg } from '../../../src/cfg'
 import { SearchParamsContext } from '../../../src/provider/search-params.provider'
+import { BitUtil } from '../../../src/util/bit.util'
 import { SuperChatUtil } from '../../../src/util/superchat.util'
 
 export default function AuthorPage() {
@@ -39,8 +40,8 @@ export default function AuthorPage() {
     initialValues: SuperChatUtil.getInitialValues(searchParams.get('types')),
     transformValues: SuperChatUtil.getTransformValues,
     onValuesChange: (value) => {
-      const newTypes = SuperChatUtil.getTypesParam(value)
-      applyParams({ types: newTypes, p: null })
+      const types = SuperChatUtil.getTypesParam(BitUtil.fromBoolsToNumber(value.types.map(v => v.checked).reverse()))
+      applyParams({ types, p: null })
     },
   })
 
@@ -190,7 +191,7 @@ export default function AuthorPage() {
         <Tabs.Panel value='sc'>
           <SuperChatRenderer
             listApiPath={`authors/${id}/schats`}
-            listApiParams={{ types: form.getTransformedValues() }}
+            listApiParams={{ ...form.getTransformedValues() }}
             statsTypesApiPath={`authors/${id}/stats/types`}
             statsColorsApiPath={`authors/${id}/stats/colors`}
             form={form}

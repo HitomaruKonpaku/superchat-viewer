@@ -1,4 +1,5 @@
 import { IPagination } from '../interface/pagination.interface'
+import { BitUtil } from './bit.util'
 import { NumberUtil } from './number.util'
 
 export class RequestUtil {
@@ -21,11 +22,10 @@ export class RequestUtil {
       'membershipGiftPurchaseAction',
       'membershipGiftRedemptionAction',
     ]
-    const defaultTypes = [
-      'addSuperChatItemAction',
-    ]
-    const tmpTypes = searchParams.get('types')?.split(',') || defaultTypes
-    const types = allTypes.filter((type) => tmpTypes.includes(type))
+    const n = Number(searchParams.get('types')) || 0
+    const types = BitUtil.fromNumberToBools(n)
+      .map((v, i) => v ? allTypes[i] : '')
+      .filter(v => v)
     return types
   }
 }
