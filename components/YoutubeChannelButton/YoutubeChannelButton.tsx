@@ -8,10 +8,21 @@ export function YoutubeChannelButton({ id }: { id: string }) {
   return (
     id
     &&
-    <Anchor href={ChannelUtil.toUrl(id)} target='_blank'>
+    <Anchor
+      href={ChannelUtil.toUrl(id)}
+      target='_blank'
+    >
       <Tooltip label='Open channel'>
-        <ActionIcon variant='light' size='xl' radius='xl' aria-label='Open'>
-          <IconBrandYoutube style={{ width: '70%', height: '70%' }} stroke={1.5} />
+        <ActionIcon
+          variant='light'
+          size='xl'
+          radius='xl'
+          aria-label='Open channel'
+        >
+          <IconBrandYoutube
+            style={{ width: '65%', height: '65%' }}
+            stroke={1.5}
+          />
         </ActionIcon>
       </Tooltip>
     </Anchor>

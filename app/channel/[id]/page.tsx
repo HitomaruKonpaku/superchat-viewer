@@ -3,6 +3,7 @@
 import { Anchor, Center, Group, Image, Menu, Stack, Table, Text, Tooltip } from '@mantine/core'
 import { useParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import { AuthorPageButton } from '../../../components/AuthorPageButton/AuthorPageButton'
 import { BackButton } from '../../../components/BackButton/BackButton'
 import { DateTimeText } from '../../../components/DateTimeText/DateTimeText'
 import { IconBoolean } from '../../../components/icon/IconBoolean'
@@ -106,17 +107,18 @@ export default function ChannelPage() {
 
   return (
     <>
-      <Group gap='sm' ml={8} mt={8}>
+      <Group gap={8} ml={8} mt={8}>
         <BackButton url={backUrl} />
         {
           id &&
           <>
+            <AuthorPageButton id={id} />
             <YoutubeChannelButton id={id} />
             <Tooltip label={channel?.description} disabled={!channel?.description} multiline>
               <Text>{channel?.name}</Text>
             </Tooltip>
           </>}
-      </Group>
+      </Group >
 
       <PaginationTable
         apiPath='videos'

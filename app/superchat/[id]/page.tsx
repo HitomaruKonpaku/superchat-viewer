@@ -120,7 +120,7 @@ export default function SuperChatPage() {
 
   return (
     <>
-      <Group gap='sm' ml={8} mt={8}>
+      <Group gap={8} ml={8} mt={8}>
         <BackButton url={backUrl} />
         <YoutubeVideoButton id={id} />
         {video?.is_members_only && <Tooltip label='Members only'><IconStarFilled color='lime' size={16} /></Tooltip>}

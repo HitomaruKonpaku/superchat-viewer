@@ -1,25 +1,24 @@
 'use client'
 
 import { ActionIcon, Anchor, Tooltip } from '@mantine/core'
-import { IconBrandYoutube } from '@tabler/icons-react'
-import { VideoUtil } from '../../src/util/video.util'
+import { IconUser } from '@tabler/icons-react'
 
-export function YoutubeVideoButton({ id }: { id: string }) {
+export function AuthorPageButton({ id }: { id: string }) {
   return (
     id
     &&
     <Anchor
-      href={VideoUtil.toUrl(id)}
+      href={`/author/${id}`}
       target='_blank'
     >
-      <Tooltip label='Open video'>
+      <Tooltip label='Show author'>
         <ActionIcon
           variant='light'
           size='xl'
           radius='xl'
-          aria-label='Open video'
+          aria-label='Show author'
         >
-          <IconBrandYoutube
+          <IconUser
             style={{ width: '65%', height: '65%' }}
             stroke={1.5}
           />

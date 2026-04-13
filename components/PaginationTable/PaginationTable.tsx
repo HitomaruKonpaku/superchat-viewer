@@ -1,6 +1,6 @@
 'use client'
 
-import { Button, Flex, Grid, Group, Input, Pagination, Table } from '@mantine/core'
+import { Button, Flex, Grid, Group, Input, Pagination, Table, Tooltip } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { useHotkeys, useMounted } from '@mantine/hooks'
 import { IconSearch, IconX } from '@tabler/icons-react'
@@ -107,9 +107,15 @@ export default function PaginationTable(props: IProps) {
   useHotkeys([
     ['ArrowLeft', toPrevPage],
     ['ArrowRight', toNextPage],
-    ['a', toPrevPage],
-    ['d', toNextPage],
-    ['ctrl+f', focusSearch],
+    ['A', toPrevPage],
+    ['D', toNextPage],
+    ['Q', toFirstPage],
+    ['E', toLastPage],
+    ['W', scrollUp],
+    ['S', scrollDown],
+    ['R', scrollTop],
+    ['F', scrollBottom],
+    ['F3', focusSearch],
   ])
 
   async function init() {
@@ -172,13 +178,41 @@ export default function PaginationTable(props: IProps) {
     return { total, items }
   }
 
+  //#region scroll
+
+  function scrollUp() {
+    const scale = 0.5
+    const top = window.scrollY - window.innerHeight * scale
+    window.scrollTo({ top, behavior: 'smooth' })
+  }
+
+  function scrollDown() {
+    const scale = 0.5
+    const top = window.scrollY + window.innerHeight * scale
+    window.scrollTo({ top, behavior: 'smooth' })
+  }
+
+  function scrollTop() {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  function scrollBottom() {
+    window.scrollTo({ top: Number.MAX_SAFE_INTEGER, behavior: 'smooth' })
+  }
+
+  //#endregion
+
   //#region search
 
   function onSearchKeyDown(event: BaseSyntheticEvent<KeyboardEvent>) {
     if (event.nativeEvent.code === 'Escape') {
       if (searchForm.values.search) {
         clearSearch()
+        return
       }
+    }
+    if (event.nativeEvent.code === 'F2') {
+      unfocusSearch()
     }
   }
 
@@ -200,6 +234,10 @@ export default function PaginationTable(props: IProps) {
     setTimeout(() => searchRef?.current?.focus())
   }
 
+  function unfocusSearch() {
+    setTimeout(() => searchRef?.current?.blur())
+  }
+
   //#endregion
 
   //#region pagination
@@ -219,15 +257,38 @@ export default function PaginationTable(props: IProps) {
     onPageChange(page)
   }
 
+  function toFirstPage() {
+    onPageChange(1)
+  }
+
+  function toLastPage() {
+    onPageChange(pageTotal)
+  }
+
   function getPagination() {
     return (
-      <Pagination
+      <Pagination.Root
         total={pageTotal}
         value={pageValue}
         size='lg'
-        withEdges
         onChange={onPageChange}
-      />
+      >
+        <Group justify='center' gap={5}>
+          <Tooltip label='(Q)'>
+            <Pagination.First />
+          </Tooltip>
+          <Tooltip label='(A)'>
+            <Pagination.Previous />
+          </Tooltip>
+          <Pagination.Items />
+          <Tooltip label='(D)'>
+            <Pagination.Next />
+          </Tooltip>
+          <Tooltip label='(E)'>
+            <Pagination.Last />
+          </Tooltip>
+        </Group>
+      </Pagination.Root>
     )
   }
 
@@ -240,17 +301,24 @@ export default function PaginationTable(props: IProps) {
           props.search &&
           <form onSubmit={searchForm.onSubmit(onSearch)} style={{ flex: 1 }}>
             <Grid gap='xs'>
-              <Grid.Col span={9}>
-                <Input
-                  type='search'
-                  miw={240}
-                  ref={searchRef}
-                  key={searchForm.key('search')}
-                  {...searchForm.getInputProps('search')}
-                  rightSection={<IconX cursor='pointer' onClick={clearSearch} />}
-                  rightSectionPointerEvents='auto'
-                  onKeyDown={onSearchKeyDown}
-                />
+              <Grid.Col span={6}>
+                <Tooltip label='(F3) to focus, (F2) to unfocus'>
+                  <Input
+                    type='search'
+                    placeholder='Search'
+                    miw={200}
+                    ref={searchRef}
+                    key={searchForm.key('search')}
+                    {...searchForm.getInputProps('search')}
+                    rightSection={
+                      <Tooltip label='(ESC)'>
+                        <IconX cursor='pointer' onClick={clearSearch} />
+                      </Tooltip>
+                    }
+                    rightSectionPointerEvents='auto'
+                    onKeyDown={onSearchKeyDown}
+                  />
+                </Tooltip>
               </Grid.Col>
 
               <Grid.Col span={3}>
