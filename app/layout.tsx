@@ -24,6 +24,10 @@ export default function RootLayout({ children }: { children: any }) {
           name='viewport'
           content='minimum-scale=1, initial-scale=1, width=device-width, user-scalable=no'
         />
+
+        <link rel='preconnect' href='https://fonts.googleapis.com' />
+        <link rel='preconnect' href='https://fonts.gstatic.com' crossOrigin='anonymous' />
+        <link href='https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap' rel="stylesheet" />
       </head>
 
       <body>

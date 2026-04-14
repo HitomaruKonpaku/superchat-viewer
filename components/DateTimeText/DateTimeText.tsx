@@ -41,12 +41,16 @@ export function DateTimeText(props: IProps) {
               <Text>{dt.toFormat(format)}</Text>
             </Menu.Item>
 
+            <Menu.Item leftSection={<Text>JST: </Text>}>
+              <Text>{dt.setZone('UTC+9').toFormat(format)}</Text>
+            </Menu.Item>
+
             <Menu.Item leftSection={<Text>UTC: </Text>}>
               <Text>{dt.setZone('UTC').toFormat(format)}</Text>
             </Menu.Item>
 
-            <Menu.Item leftSection={<Text>JST: </Text>}>
-              <Text>{dt.setZone('UTC+9').toFormat(format)}</Text>
+            <Menu.Item>
+              <Text ta={'right'}>{dt.toRelative({ locale: navigator.language || 'en' })}</Text>
             </Menu.Item>
           </Menu.Dropdown>
         </Menu>
