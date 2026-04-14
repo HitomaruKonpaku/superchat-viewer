@@ -23,9 +23,10 @@ export class RequestUtil {
       'membershipGiftRedemptionAction',
     ]
     const n = Number(searchParams.get('types')) || 0
-    const types = BitUtil.fromNumberToBools(n)
+    const arr = BitUtil.fromNumberToBools(n, allTypes.length).reverse()
+    const types = arr
       .map((v, i) => v ? allTypes[i] : '')
-      .filter(v => v)
+      .filter((v) => v)
     return types
   }
 }
