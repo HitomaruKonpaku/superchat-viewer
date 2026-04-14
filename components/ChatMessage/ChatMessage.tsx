@@ -124,8 +124,9 @@ function ChatMessageComponent({ message, emojis }: IProps) {
             return (
               <Text
                 key={index}
-                span
                 mx={1}
+                span
+                style={{ verticalAlign: 'middle' }}
               >{emojiLabel}</Text>
             )
           }
@@ -133,8 +134,9 @@ function ChatMessageComponent({ message, emojis }: IProps) {
           return (
             <Text
               key={index}
-              span
               mx={1}
+              span
+              style={{ verticalAlign: 'middle' }}
             >{run.value}</Text>
           )
         })
