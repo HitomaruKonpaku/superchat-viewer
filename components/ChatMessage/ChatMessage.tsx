@@ -16,32 +16,29 @@ function escapeRegex(source: string): string {
   return source.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
 
-function buildRuns(msg: string, emojiTokens: string[]): ChatMessageRun[] {
+function buildRuns(msg: string, emojiTokens: Set<string>): ChatMessageRun[] {
   if (!msg) {
     return []
   }
 
-  if (!emojiTokens.length) {
+  if (!emojiTokens.size) {
     return [{ type: 'text', value: msg }]
   }
 
-  const pattern = emojiTokens
-    .slice()
-    .sort((a, b) => b.length - a.length)
+  const pattern = [...emojiTokens]
     .map(escapeRegex)
     .join('|')
 
   const regex = new RegExp(`(${pattern})`, 'g')
   const rawParts = msg.split(regex)
-  const tokenSet = new Set(emojiTokens)
 
   return rawParts
     .filter((part) => part.length > 0)
     .map((part) => {
-      if (tokenSet.has(part)) {
+      if (emojiTokens.has(part)) {
         return {
           type: 'emoji',
-          value: part.slice(1, -1),
+          value: part,
         }
       }
       return {
@@ -51,17 +48,18 @@ function buildRuns(msg: string, emojiTokens: string[]): ChatMessageRun[] {
     })
 }
 
-function extractEmojiTokens(msg: string): string[] {
+function extractEmojiTokens(msg: string): Set<string> {
   if (!msg) {
-    return []
+    return new Set()
   }
 
   const matches = msg.match(/:[^:\s]+:/g)
   if (!matches) {
-    return []
+    return new Set()
   }
 
-  return Array.from(new Set(matches))
+  const tokens = new Set(matches)
+  return tokens
 }
 
 function ChatMessageComponent({ message, emojis }: IProps) {
@@ -69,16 +67,15 @@ function ChatMessageComponent({ message, emojis }: IProps) {
 
   const emojiMap = useMemo(() => {
     const map = new Map<string, Emoji>()
-    if (!emojiTokens.length) {
+    if (!emojiTokens.size) {
       return map
     }
 
-    const labels = new Set(emojiTokens.map((t) => t.slice(1, -1)))
     for (const emoji of (emojis || [])) {
-      const term = emoji.search_terms.find((v) => labels.has(v))
-      if (term) {
-        map.set(term, emoji)
-        if (map.size === labels.size) {
+      const key = emoji.shortcuts.find((v) => emojiTokens.has(v))
+      if (key) {
+        map.set(key, emoji)
+        if (map.size === emojiTokens.size) {
           break
         }
       }
@@ -98,22 +95,20 @@ function ChatMessageComponent({ message, emojis }: IProps) {
         runs.map((run, index) => {
           if (run.type === 'emoji') {
             const emoji = emojiMap.get(run.value)
-            const emojiLabel = `:${run.value}:`
-
             if (emoji) {
               const thumbnail = emoji.thumbnails[0]
               if (thumbnail) {
                 return (
                   <Tooltip
                     key={index}
-                    label={emojiLabel}
+                    label={run.value}
                   >
                     <Image
                       src={thumbnail.url}
                       w={thumbnail.width}
                       h={thumbnail.height}
                       mx={1}
-                      alt={emojiLabel}
+                      alt={run.value}
                       referrerPolicy='no-referrer'
                       style={{ display: 'inline-block', verticalAlign: 'middle' }}
                     />
@@ -128,7 +123,7 @@ function ChatMessageComponent({ message, emojis }: IProps) {
                 mx={1}
                 span
                 style={{ verticalAlign: 'middle' }}
-              >{emojiLabel}</Text>
+              >{run.value}</Text>
             )
           }
 

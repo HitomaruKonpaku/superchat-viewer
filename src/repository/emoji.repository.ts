@@ -8,8 +8,8 @@ export async function getEmojis(channelIds: string[]) {
   const query = db.createQueryBuilder()
     .select('id')
     .addSelect('channel_id')
-    // .addSelect('shortcuts')
-    .addSelect('search_terms')
+    .addSelect('shortcuts')
+    // .addSelect('search_terms')
     // .addSelect(`image #>> '{accessibility,accessibilityData,label}'`, 'label')
     // eslint-disable-next-line quotes
     .addSelect(`image -> 'thumbnails'`, 'thumbnails')
