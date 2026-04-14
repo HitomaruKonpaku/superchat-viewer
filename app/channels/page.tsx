@@ -27,10 +27,10 @@ export default function ChannelListPage() {
             <Center>
               <Image
                 src={element.thumbnail_url}
-                referrerPolicy='no-referrer'
-                radius='sm'
                 w={100}
                 h={100}
+                radius='sm'
+                referrerPolicy='no-referrer'
               />
             </Center>
           </Anchor>

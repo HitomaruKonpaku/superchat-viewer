@@ -57,10 +57,10 @@ export default function VideoListPage() {
             <Center>
               <Image
                 src={VideoUtil.toThumbnailMq(element.id)}
-                referrerPolicy='no-referrer'
-                radius='sm'
                 maw={320}
                 mah={180}
+                radius='sm'
+                referrerPolicy='no-referrer'
               />
             </Center>
           </Anchor>

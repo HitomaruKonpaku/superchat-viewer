@@ -104,10 +104,10 @@ export default function AuthorPage() {
                 element.channel_thumbnail_url &&
                 <Image
                   src={element.channel_thumbnail_url}
-                  referrerPolicy='no-referrer'
-                  radius='sm'
                   w={40}
                   h={40}
+                  radius='sm'
+                  referrerPolicy='no-referrer'
                 />
               }
 

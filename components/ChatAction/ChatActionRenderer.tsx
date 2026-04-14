@@ -1,11 +1,14 @@
 import { Divider, Group, Image, Menu, Text } from '@mantine/core'
 import { IconGiftFilled, IconStarFilled } from '@tabler/icons-react'
 import { useEffect, useState } from 'react'
+import { Emoji } from '../../src/interface/emoji.interface'
 import { EmojiUtil } from '../../src/util/emoji.util'
+import ChatMessage from '../ChatMessage/ChatMessage'
 import MenuItemCopy from '../menu-item/MenuItemCopy'
 
 interface IProps {
   value: any
+  emojis?: Emoji[]
 }
 
 export function ChatActionRenderer(props: IProps) {
@@ -44,9 +47,9 @@ export function ChatActionRenderer(props: IProps) {
                   element.membership_thumbnail &&
                   <Image
                     src={element.membership_thumbnail}
-                    referrerPolicy='no-referrer'
                     w={20}
                     h={20}
+                    referrerPolicy='no-referrer'
                   />
                 }
               </Group>
@@ -78,9 +81,10 @@ export function ChatActionRenderer(props: IProps) {
 
               <Menu position='bottom-start'>
                 <Menu.Target>
-                  <Text ta='justify' style={{ wordBreak: 'break-word' }}>
-                    {element.message}
-                  </Text>
+                  <ChatMessage
+                    message={element.message}
+                    emojis={props.emojis}
+                  />
                 </Menu.Target>
 
                 <Menu.Dropdown>

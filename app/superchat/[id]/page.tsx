@@ -17,6 +17,7 @@ import MenuItemYoutubeChannel from '../../../components/menu-item/MenuItemYoutub
 import { YoutubeVideoButton } from '../../../components/YoutubeVideoButton/YoutubeVideoButton'
 import { api } from '../../../src/api'
 import { cfg } from '../../../src/cfg'
+import { Emoji } from '../../../src/interface/emoji.interface'
 import { SearchParamsContext } from '../../../src/provider/search-params.provider'
 import { BitUtil } from '../../../src/util/bit.util'
 import { SuperChatUtil } from '../../../src/util/superchat.util'
@@ -28,6 +29,7 @@ export default function SuperChatPage() {
   const [pollInterval, setPollInterval] = useState(cfg.superchat.pollInterval)
   const id = useParams().id?.toString() as string
   const [video, setVideo] = useState<any>(null)
+  const [emojis, setEmojis] = useState<Emoji[]>([])
 
   const form = useForm({
     mode: 'uncontrolled',
@@ -42,8 +44,15 @@ export default function SuperChatPage() {
   //#region data
 
   useEffect(() => {
-    initData()
-  }, [])
+    async function load() {
+      const res = await initData()
+      if (res?.channel_id) {
+        await initEmojis(res.channel_id)
+      }
+    }
+
+    load()
+  }, [id])
 
   async function initData() {
     const url = `videos/${id}`
@@ -55,6 +64,21 @@ export default function SuperChatPage() {
       if (data.actual_end) {
         setPollInterval(0)
       }
+      return data
+    } catch (error: any) {
+      console.warn(error.message)
+    }
+  }
+
+  async function initEmojis(channelId: string) {
+    if (!channelId) {
+      return
+    }
+
+    const url = `channels/${channelId}/emojis`
+    try {
+      const { data } = await api.get(url)
+      setEmojis(data.items)
     } catch (error: any) {
       console.warn(error.message)
     }
@@ -76,10 +100,10 @@ export default function SuperChatPage() {
                 element.author_photo &&
                 <Image
                   src={element.author_photo}
-                  referrerPolicy='no-referrer'
-                  radius='sm'
                   w={40}
                   h={40}
+                  radius='sm'
+                  referrerPolicy='no-referrer'
                 />
               }
 
@@ -112,7 +136,11 @@ export default function SuperChatPage() {
             </Group>
 
             <Divider my={4} />
-            <ChatActionRenderer value={element} />
+
+            <ChatActionRenderer
+              value={element}
+              emojis={emojis}
+            />
           </Stack>
         </Table.Td>
       </Table.Tr >

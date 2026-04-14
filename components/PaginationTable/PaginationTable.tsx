@@ -35,7 +35,7 @@ export default function PaginationTable(props: IProps) {
   const timerDelayRef = useRef(props.pollInterval)
   const abortControllerRef = useRef<AbortController | null>(null)
 
-  const [rows, setRows] = useState<any[]>([])
+  const [items, setItems] = useState<any[]>([])
   const [query, setQuery] = useState('')
   const [limit, setLimit] = useState(cfg.defaultValue.limit)
   const [pageValue, setPageValue] = useState(cfg.defaultValue.page)
@@ -147,7 +147,7 @@ export default function PaginationTable(props: IProps) {
 
     try {
       const { total, items } = await fetchData()
-      setRows(items.map((item: any, index: number) => props.toRow?.(item, index, limit, pageValue)))
+      setItems(items)
       setPageTotal(Math.max(1, Math.floor((total - 1) / limit) + 1))
     } finally {
       setLoading(false)
@@ -335,7 +335,9 @@ export default function PaginationTable(props: IProps) {
 
       <Table stickyHeader striped={props.striped} highlightOnHover withTableBorder withColumnBorders>
         <Table.Thead>{props.thead}</Table.Thead>
-        <Table.Tbody>{rows}</Table.Tbody>
+        <Table.Tbody>
+          {items.map((item: any, index: number) => props.toRow?.(item, index, limit, pageValue))}
+        </Table.Tbody>
       </Table>
 
       <Flex justify={!props.search ? 'center' : 'flex-end'} mx={8} mb={16}>
