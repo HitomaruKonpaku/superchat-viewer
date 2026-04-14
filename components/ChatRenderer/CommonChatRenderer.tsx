@@ -7,8 +7,11 @@ import PaginationTable from '../PaginationTable/PaginationTable'
 interface IProps {
   listApiPath: string
   listApiParams?: Record<string, any>
+  onListApiResponse?: (data: any) => any
+
   limit?: number
   pollInterval?: number
+
   toRow: (element: Record<string, any>, index: number, limit: number, page: number) => JSX.Element
 }
 
@@ -18,6 +21,7 @@ export function CommonChatRenderer(props: IProps) {
       <PaginationTable
         apiPath={props.listApiPath}
         apiParams={props.listApiParams}
+        onApiResponse={props.onListApiResponse}
         limit={props.limit || 10}
         thead={
           <Table.Tr>

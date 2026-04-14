@@ -11,11 +11,16 @@ import PaginationTable from '../PaginationTable/PaginationTable'
 interface IProps {
   listApiPath: string
   listApiParams?: Record<string, any>
+  onListApiResponse?: (data: any) => any
+
   statsTypesApiPath?: string
   statsColorsApiPath?: string
+
   form: UseFormReturnType<ChatActionFormValue, Record<string, any>>
+
   limit?: number
   pollInterval?: number
+
   toRow: (element: Record<string, any>, index: number, limit: number, page: number) => JSX.Element
 }
 
@@ -36,6 +41,7 @@ export function SuperChatRenderer(props: IProps) {
       <PaginationTable
         apiPath={props.listApiPath}
         apiParams={props.listApiParams}
+        onApiResponse={props.onListApiResponse}
         limit={props.limit || 10}
         pollInterval={props.pollInterval}
         thead={

@@ -56,7 +56,7 @@ function extractEmojiTokens(msg: string): string[] {
     return []
   }
 
-  const matches = msg.match(/:\w+:/g)
+  const matches = msg.match(/:[^:\s]+:/g)
   if (!matches) {
     return []
   }
@@ -75,8 +75,9 @@ function ChatMessageComponent({ message, emojis }: IProps) {
 
     const labels = new Set(emojiTokens.map((t) => t.slice(1, -1)))
     for (const emoji of (emojis || [])) {
-      if (emoji.label && labels.has(emoji.label)) {
-        map.set(emoji.label, emoji)
+      const term = emoji.search_terms.find((v) => labels.has(v))
+      if (term) {
+        map.set(term, emoji)
         if (map.size === labels.size) {
           break
         }

@@ -13,6 +13,7 @@ import { SearchParamsContext } from '../../src/provider/search-params.provider'
 interface IProps {
   apiPath: string
   apiParams?: Record<string, any>
+  onApiResponse?: (data: any) => any
 
   limit?: number
   page?: number
@@ -146,9 +147,11 @@ export default function PaginationTable(props: IProps) {
     setLoading(true)
 
     try {
-      const { total, items } = await fetchData()
+      const data = await fetchData()
+      const { total, items } = data
       setItems(items)
       setPageTotal(Math.max(1, Math.floor((total - 1) / limit) + 1))
+      props.onApiResponse?.(data)
     } finally {
       setLoading(false)
     }
@@ -168,14 +171,14 @@ export default function PaginationTable(props: IProps) {
     }
     const controller = new AbortController()
     abortControllerRef.current = controller
-    const { data: { total, items } } = await api.get(
+    const { data } = await api.get(
       props.apiPath,
       {
         params,
         signal: controller.signal,
       },
     )
-    return { total, items }
+    return data
   }
 
   //#region scroll

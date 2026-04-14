@@ -3,7 +3,7 @@
 import { Anchor, Divider, Group, Image, Menu, Stack, Table, Tabs, Text } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { useParams } from 'next/navigation'
-import { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useMemo, useState } from 'react'
 import { BackButton } from '../../../components/BackButton/BackButton'
 import { ChatActionRenderer } from '../../../components/ChatAction/ChatActionRenderer'
 import { CommonChatRenderer } from '../../../components/ChatRenderer/CommonChatRenderer'
@@ -20,6 +20,7 @@ import MenuItemYoutubeVideo from '../../../components/menu-item/MenuItemYoutubeV
 import { YoutubeChannelButton } from '../../../components/YoutubeChannelButton/YoutubeChannelButton'
 import { api } from '../../../src/api'
 import { cfg } from '../../../src/cfg'
+import { Emoji } from '../../../src/interface/emoji.interface'
 import { SearchParamsContext } from '../../../src/provider/search-params.provider'
 import { BitUtil } from '../../../src/util/bit.util'
 import { SuperChatUtil } from '../../../src/util/superchat.util'
@@ -31,6 +32,7 @@ export default function AuthorPage() {
   const [pollInterval] = useState(cfg.author.chat.pollInterval)
   const id = useParams().id?.toString() as string
   const [author, setAuthor] = useState<any>(null)
+  const [emojis, setEmojis] = useState<Emoji[]>([])
 
   const [defaultTab] = useState('sc')
   const [activeTab, setActiveTab] = useState<string>(searchParams.get('tab') || defaultTab)
@@ -51,6 +53,21 @@ export default function AuthorPage() {
     initData()
   }, [])
 
+  const emojiMap = useMemo(() => {
+    const map = new Map<string, Emoji[]>()
+    if (!emojis.length) {
+      return map
+    }
+
+    const channelIds = [...  new Set(emojis.map((v) => v.channel_id))]
+    channelIds.forEach(channelId => {
+      const channelEmojis = emojis.filter(v => v.channel_id === channelId)
+      map.set(channelId, channelEmojis)
+    })
+
+    return map
+  }, [emojis])
+
   async function initData() {
     if (!id) {
       return
@@ -61,6 +78,20 @@ export default function AuthorPage() {
       const { data } = await api.get(url)
       document.title = data.name
       setAuthor(data)
+    } catch (error: any) {
+      console.warn(error.message)
+    }
+  }
+
+  async function initEmojis(channelIds: string[]) {
+    if (!channelIds.length) {
+      return
+    }
+
+    const url = 'emojis'
+    try {
+      const { data } = await api.get(url, { params: { channel_id: channelIds.join(',') } })
+      setEmojis(data.items)
     } catch (error: any) {
       console.warn(error.message)
     }
@@ -89,6 +120,11 @@ export default function AuthorPage() {
   }
 
   //#endregion
+
+  function onListApiResponse(data: any) {
+    const channelIds = [...new Set(data.items.map((v: any) => v.channel_id))] as string[]
+    initEmojis(channelIds)
+  }
 
   function toRow(element: Record<string, any>, index: number, limit: number, page: number) {
     return (
@@ -159,7 +195,11 @@ export default function AuthorPage() {
             </Group>
 
             <Divider my={4} />
-            <ChatActionRenderer value={element} />
+
+            <ChatActionRenderer
+              value={element}
+              emojis={emojiMap.get(element.channel_id)}
+            />
           </Stack>
         </Table.Td>
       </Table.Tr>
@@ -192,6 +232,7 @@ export default function AuthorPage() {
           <SuperChatRenderer
             listApiPath={`authors/${id}/schats`}
             listApiParams={{ ...form.getTransformedValues() }}
+            onListApiResponse={onListApiResponse}
             statsTypesApiPath={`authors/${id}/stats/types`}
             statsColorsApiPath={`authors/${id}/stats/colors`}
             form={form}
@@ -205,6 +246,7 @@ export default function AuthorPage() {
         <Tabs.Panel value='msg'>
           <CommonChatRenderer
             listApiPath={`authors/${id}/chats`}
+            onListApiResponse={onListApiResponse}
             limit={cfg.author.chat.limit}
             pollInterval={pollInterval}
             toRow={toRow}
