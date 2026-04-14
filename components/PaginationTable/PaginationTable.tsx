@@ -181,13 +181,13 @@ export default function PaginationTable(props: IProps) {
   //#region scroll
 
   function scrollUp() {
-    const scale = 0.5
+    const scale = 0.75
     const top = window.scrollY - window.innerHeight * scale
     window.scrollTo({ top, behavior: 'smooth' })
   }
 
   function scrollDown() {
-    const scale = 0.5
+    const scale = 0.75
     const top = window.scrollY + window.innerHeight * scale
     window.scrollTo({ top, behavior: 'smooth' })
   }
