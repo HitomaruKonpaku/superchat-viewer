@@ -9,7 +9,7 @@ interface IProps {
 export default function MenuItemAppSuperChat(props: IProps) {
   return (
     <Anchor
-      href={`/superchat/${props.id}`}
+      href={`/video/${props.id}`}
       target='_blank'
       underline='never'
     >

@@ -53,7 +53,7 @@ export default function VideoListPage() {
         </Table.Td>
 
         <Table.Td p={0}>
-          <Anchor href={`/superchat/${element.id}`} h='100%'>
+          <Anchor href={`/video/${element.id}`} h='100%'>
             <Center>
               <Image
                 src={VideoUtil.toThumbnailMq(element.id)}

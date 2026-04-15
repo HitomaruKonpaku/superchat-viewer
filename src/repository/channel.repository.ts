@@ -71,13 +71,11 @@ export async function getChannelById(id: string) {
   'use cache'
   cacheLife('minutes')
 
-  const query = `
-SELECT *
-FROM youtube_channel
-WHERE id = $1
-  `
+  const query = db.createQueryBuilder()
+    .from('youtube_channel', 'yc')
+    .andWhere('id = :id', { id })
 
-  const { rowCount, rows } = await pool.query(query, [id])
+  const { rowCount, rows } = await pool.query(...query.getQueryAndParameters())
   if (!rowCount) {
     notFound()
   }

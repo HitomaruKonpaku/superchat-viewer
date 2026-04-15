@@ -3,6 +3,27 @@ import { notFound } from 'next/navigation'
 import { db, pool } from '../db'
 import { IPagination } from '../interface/pagination.interface'
 
+export async function getAuthorById(id: string) {
+  'use cache'
+  cacheLife('minutes')
+
+  const query = db.createQueryBuilder()
+    .addSelect('author_channel_id', 'id')
+    .addSelect('author_name', 'name')
+    .addSelect('author_photo', 'photo')
+    .from('youtube_chat_action', 'yca')
+    .andWhere('author_channel_id = :id', { id })
+    .addOrderBy('yca."created_at"', 'DESC')
+    .limit(1)
+
+  const { rowCount, rows } = await pool.query(...query.getQueryAndParameters())
+  if (!rowCount) {
+    notFound()
+  }
+
+  return rows[0]
+}
+
 export async function getAuthorSuperChats(
   authorId: string,
   opts: IPagination & {
@@ -64,6 +85,83 @@ END
 
   const { rows } = await pool.query(...queryItem.getQueryAndParameters())
   return { total: Number(count), items: rows }
+}
+
+export async function getAuthorSuperChatTypes(
+  authorId: string,
+) {
+  'use cache'
+  cacheLife('minutes')
+
+  if (!authorId) {
+    throw new Error('AUTHOR_ID_NOT_FOUND')
+  }
+
+  const query = `
+SELECT type,
+  COUNT(*) AS count
+FROM youtube_chat_action
+WHERE author_channel_id = $1
+GROUP BY type
+ORDER BY type
+  `
+
+  const { rows } = await pool.query(query, [authorId])
+  const items = rows.map(v => {
+    v.count = Number(v.count)
+    return v
+  })
+
+  return { total: items.length, items }
+}
+
+export async function getAuthorSuperChatColors(
+  authorId: string,
+) {
+  'use cache'
+  cacheLife('minutes')
+
+  if (!authorId) {
+    throw new Error('AUTHOR_ID_NOT_FOUND')
+  }
+
+  const query = `
+WITH sig AS (
+  SELECT generate_series(1, 7) AS id
+),
+yca_sig AS (
+  SELECT significance,
+    COUNT(*) AS cnt
+  FROM youtube_chat_action
+  WHERE author_channel_id = $1
+    AND type = 'addSuperChatItemAction'
+  GROUP BY significance
+)
+SELECT s.id AS significance,
+  (
+    ARRAY [
+      'blue',
+      'lightblue',
+      'green',
+      'yellow',
+      'orange',
+      'magenta',
+      'red'
+    ]
+  ) [s.id] AS color,
+  COALESCE(ys.cnt, 0) AS count
+FROM sig AS s
+  LEFT JOIN yca_sig AS ys ON ys.significance = s.id
+ORDER BY s.id
+  `
+
+  const { rows } = await pool.query(query, [authorId])
+  const items = rows.map(v => {
+    v.count = Number(v.count)
+    return v
+  })
+
+  return { total: items.length, items }
 }
 
 export async function getAuthorBaseChats(
@@ -139,102 +237,4 @@ export async function getAuthorBaseChats(
   })
 
   return { total, items }
-}
-
-export async function getAuthorById(id: string) {
-  'use cache'
-  cacheLife('minutes')
-
-  const queryBase = db.createQueryBuilder()
-    .addSelect('author_channel_id', 'id')
-    .addSelect('author_name', 'name')
-    .addSelect('author_photo', 'photo')
-    .from('youtube_chat_action', 'yca')
-    .andWhere('author_channel_id = :authorId', { authorId: id })
-    .addOrderBy('yca."created_at"', 'DESC')
-    .limit(1)
-
-  const { rowCount, rows } = await pool.query(...queryBase.getQueryAndParameters())
-  if (!rowCount) {
-    notFound()
-  }
-
-  return rows[0]
-}
-
-export async function getSuperChatTypesByAuthorId(
-  authorId: string,
-) {
-  'use cache'
-  cacheLife('minutes')
-
-  if (!authorId) {
-    throw new Error('AUTHOR_ID_NOT_FOUND')
-  }
-
-  const query = `
-SELECT type,
-  COUNT(*) AS count
-FROM youtube_chat_action
-WHERE author_channel_id = $1
-GROUP BY type
-ORDER BY type
-  `
-
-  const { rows } = await pool.query(query, [authorId])
-  const items = rows.map(v => {
-    v.count = Number(v.count)
-    return v
-  })
-
-  return { total: items.length, items }
-}
-
-export async function getSuperChatColorsByAuthorId(
-  authorId: string,
-) {
-  'use cache'
-  cacheLife('minutes')
-
-  if (!authorId) {
-    throw new Error('AUTHOR_ID_NOT_FOUND')
-  }
-
-  const query = `
-WITH sig AS (
-  SELECT generate_series(1, 7) AS id
-),
-yca_sig AS (
-  SELECT significance,
-    COUNT(*) AS cnt
-  FROM youtube_chat_action
-  WHERE author_channel_id = $1
-    AND type = 'addSuperChatItemAction'
-  GROUP BY significance
-)
-SELECT s.id AS significance,
-  (
-    ARRAY [
-      'blue',
-      'lightblue',
-      'green',
-      'yellow',
-      'orange',
-      'magenta',
-      'red'
-    ]
-  ) [s.id] AS color,
-  COALESCE(ys.cnt, 0) AS count
-FROM sig AS s
-  LEFT JOIN yca_sig AS ys ON ys.significance = s.id
-ORDER BY s.id
-  `
-
-  const { rows } = await pool.query(query, [authorId])
-  const items = rows.map(v => {
-    v.count = Number(v.count)
-    return v
-  })
-
-  return { total: items.length, items }
 }
