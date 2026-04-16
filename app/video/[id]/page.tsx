@@ -17,6 +17,7 @@ import MenuItemYoutubeChannel from '../../../components/menu-item/MenuItemYoutub
 import { YoutubeVideoButton } from '../../../components/YoutubeVideoButton/YoutubeVideoButton'
 import { api } from '../../../src/api'
 import { cfg } from '../../../src/cfg'
+import { EMOJI_DEFAULT_CHANNELS } from '../../../src/constant/emoji.constant'
 import { Emoji } from '../../../src/interface/emoji.interface'
 import { SearchParamsContext } from '../../../src/provider/search-params.provider'
 import { BitUtil } from '../../../src/util/bit.util'
@@ -75,9 +76,13 @@ export default function VideoPage() {
       return
     }
 
-    const url = `channels/${channelId}/emojis`
+    const url = 'emojis'
     try {
-      const { data } = await api.get(url)
+      const { data } = await api.get(url, {
+        params: {
+          channel_id: [channelId, ...EMOJI_DEFAULT_CHANNELS].join(','),
+        },
+      })
       setEmojis(data.items)
     } catch (error: any) {
       console.warn(error.message)

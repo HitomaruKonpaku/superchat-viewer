@@ -31,8 +31,7 @@ function buildRuns(msg: string, emojiTokens: Set<string>): ChatMessageRun[] {
 
   const regex = new RegExp(`(${pattern})`, 'g')
   const rawParts = msg.split(regex)
-
-  return rawParts
+  const runs = rawParts
     .filter((part) => part.length > 0)
     .map((part) => {
       if (emojiTokens.has(part)) {
@@ -45,7 +44,9 @@ function buildRuns(msg: string, emojiTokens: Set<string>): ChatMessageRun[] {
         type: 'text',
         value: part,
       }
-    })
+    }) as ChatMessageRun[]
+
+  return runs
 }
 
 function extractEmojiTokens(msg: string): Set<string> {

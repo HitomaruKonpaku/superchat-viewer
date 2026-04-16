@@ -20,6 +20,7 @@ import MenuItemYoutubeVideo from '../../../components/menu-item/MenuItemYoutubeV
 import { YoutubeChannelButton } from '../../../components/YoutubeChannelButton/YoutubeChannelButton'
 import { api } from '../../../src/api'
 import { cfg } from '../../../src/cfg'
+import { EMOJI_DEFAULT_CHANNELS } from '../../../src/constant/emoji.constant'
 import { Emoji } from '../../../src/interface/emoji.interface'
 import { SearchParamsContext } from '../../../src/provider/search-params.provider'
 import { ArrayUtil } from '../../../src/util/array.util'
@@ -77,7 +78,11 @@ export default function AuthorPage() {
 
     const url = 'emojis'
     try {
-      const { data } = await api.get(url, { params: { channel_id: channelIds.join(',') } })
+      const { data } = await api.get(url, {
+        params: {
+          channel_id: channelIds.join(','),
+        },
+      })
       const { items } = data
       channelIds.forEach((channelId) => {
         channelEmojisRef.current.set(channelId, items.filter((v: Emoji) => v.channel_id === channelId))
@@ -113,13 +118,24 @@ export default function AuthorPage() {
   //#endregion
 
   function onListApiResponse(data: any) {
-    const activeChannelIds = [...   new Set(data.items.map((v: any) => v.channel_id))]
+    const activeChannelIds = [
+      ...new Set(data.items.map((v: any) => v.channel_id)),
+      ...EMOJI_DEFAULT_CHANNELS,
+    ]
     const curChannelIds = channelEmojisRef.current.keys().toArray()
     const newChannelIds = ArrayUtil.difference(activeChannelIds, curChannelIds) as string[]
     initEmojis(newChannelIds)
   }
 
   function toRow(element: Record<string, any>, index: number, limit: number, page: number) {
+    const rowChannelIds = [
+      element.channel_id,
+      ...EMOJI_DEFAULT_CHANNELS,
+    ]
+    const rowEmojis = rowChannelIds
+      .map(id => channelEmojis.get(id) || [])
+      .flat() as Emoji[]
+
     return (
       <Table.Tr key={element.id}>
         <Table.Td ta='right'>
@@ -191,7 +207,7 @@ export default function AuthorPage() {
 
             <ChatActionRenderer
               value={element}
-              emojis={channelEmojis.get(element.channel_id)}
+              emojis={rowEmojis}
             />
           </Stack>
         </Table.Td>
