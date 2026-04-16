@@ -1,3 +1,5 @@
 # superchat-viewer
 
-SuperChat viewer for <https://github.com/HitomaruKonpaku/chat-relay>
+> Live: <https://sc.hitomaru.dev>
+
+SuperChat Viewer for <https://github.com/HitomaruKonpaku/chat-relay>
