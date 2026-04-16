@@ -1,10 +1,13 @@
 import { Box, Image, Text, Tooltip } from '@mantine/core'
 import { memo, useMemo } from 'react'
-import { Emoji } from '../../src/interface/emoji.interface'
+import { EMOJI_DEFAULT_CHANNELS } from '../../src/constant/emoji.constant'
+import { ChannelEmojis } from '../../src/interface/emoji.interface'
+import { Thumbnail } from '../../src/interface/thumbnail.interface'
 
 type IProps = {
   message: string
-  emojis?: Emoji[]
+  channelId?: string
+  channelEmojis?: ChannelEmojis
 }
 
 type ChatMessageRun = {
@@ -63,27 +66,8 @@ function extractEmojiTokens(msg: string): Set<string> {
   return tokens
 }
 
-function ChatMessageComponent({ message, emojis }: IProps) {
+function ChatMessageComponent({ message, channelId, channelEmojis }: IProps) {
   const emojiTokens = useMemo(() => extractEmojiTokens(message), [message])
-
-  const emojiMap = useMemo(() => {
-    const map = new Map<string, Emoji>()
-    if (!emojiTokens.size) {
-      return map
-    }
-
-    for (const emoji of (emojis || [])) {
-      const key = emoji.shortcuts.find((v) => emojiTokens.has(v))
-      if (key) {
-        map.set(key, emoji)
-        if (map.size === emojiTokens.size) {
-          break
-        }
-      }
-    }
-
-    return map
-  }, [emojiTokens, emojis])
 
   const runs = useMemo(() => buildRuns(message, emojiTokens), [message, emojiTokens])
 
@@ -95,27 +79,37 @@ function ChatMessageComponent({ message, emojis }: IProps) {
       {
         runs.map((run, index) => {
           if (run.type === 'emoji') {
-            const emoji = emojiMap.get(run.value)
-            if (emoji) {
-              const thumbnail = emoji.thumbnails[0]
-              if (thumbnail) {
-                return (
-                  <Tooltip
-                    key={index}
-                    label={run.value}
-                  >
-                    <Image
-                      src={thumbnail.url}
-                      w={thumbnail.width}
-                      h={thumbnail.height}
-                      mx={1}
-                      alt={run.value}
-                      referrerPolicy='no-referrer'
-                      style={{ display: 'inline-block', verticalAlign: 'middle' }}
-                    />
-                  </Tooltip>
-                )
+            let thumbnail: Thumbnail | undefined
+
+            if (channelId) {
+              thumbnail = channelEmojis?.get(channelId)?.get(run.value)
+              if (!thumbnail) {
+                for (const key of EMOJI_DEFAULT_CHANNELS) {
+                  thumbnail = channelEmojis?.get(key)?.get(run.value)
+                  if (thumbnail) {
+                    break
+                  }
+                }
               }
+            }
+
+            if (thumbnail) {
+              return (
+                <Tooltip
+                  key={index}
+                  label={run.value}
+                >
+                  <Image
+                    src={thumbnail.url}
+                    w={thumbnail.width}
+                    h={thumbnail.height}
+                    mx={1}
+                    alt={run.value}
+                    referrerPolicy='no-referrer'
+                    style={{ display: 'inline-block', verticalAlign: 'middle' }}
+                  />
+                </Tooltip>
+              )
             }
 
             return (

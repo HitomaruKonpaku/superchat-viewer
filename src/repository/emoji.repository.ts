@@ -22,3 +22,29 @@ export async function getEmojis(channelIds: string[]) {
   const { rows: items } = await pool.query(...query.getQueryAndParameters())
   return { total: items.length, items }
 }
+
+export async function getChannelEmojis(channelIds: string[]) {
+  'use cache'
+  cacheLife('minutes')
+
+  if (!channelIds.length) {
+    return { total: 0, items: [] }
+  }
+
+  const query = `
+SELECT channel_id,
+  json_agg(
+    json_build_object(
+      'id', id,
+      'shortcuts', shortcuts,
+      'thumbnails', image -> 'thumbnails'
+    )
+  ) AS emojis
+FROM youtube_chat_emoji AS yce
+WHERE channel_id = ANY($1)
+GROUP BY channel_id
+  `
+
+  const { rows: items } = await pool.query(query, [channelIds])
+  return { total: items.length, items }
+}

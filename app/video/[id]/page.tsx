@@ -18,19 +18,19 @@ import { YoutubeVideoButton } from '../../../components/YoutubeVideoButton/Youtu
 import { api } from '../../../src/api'
 import { cfg } from '../../../src/cfg'
 import { EMOJI_DEFAULT_CHANNELS } from '../../../src/constant/emoji.constant'
-import { Emoji } from '../../../src/interface/emoji.interface'
+import { ChannelEmojiContext } from '../../../src/provider/channel-emoji.provider'
 import { SearchParamsContext } from '../../../src/provider/search-params.provider'
 import { BitUtil } from '../../../src/util/bit.util'
 import { SuperChatUtil } from '../../../src/util/superchat.util'
 
 export default function VideoPage() {
   const { searchParams, applyParams } = useContext(SearchParamsContext)
+  const { channelEmojis, addItems } = useContext(ChannelEmojiContext)
 
   const [backUrl, setBackUrl] = useState('/channels')
   const [pollInterval, setPollInterval] = useState(cfg.superchat.pollInterval)
   const id = useParams().id?.toString() as string
   const [video, setVideo] = useState<any>(null)
-  const [emojis, setEmojis] = useState<Emoji[]>([])
 
   const form = useForm({
     mode: 'uncontrolled',
@@ -76,14 +76,14 @@ export default function VideoPage() {
       return
     }
 
-    const url = 'emojis'
+    const url = 'channel-emojis'
     try {
       const { data } = await api.get(url, {
         params: {
           channel_id: [channelId, ...EMOJI_DEFAULT_CHANNELS].join(','),
         },
       })
-      setEmojis(data.items)
+      addItems(data.items)
     } catch (error: any) {
       console.warn(error.message)
     }
@@ -144,7 +144,8 @@ export default function VideoPage() {
 
             <ChatActionRenderer
               value={element}
-              emojis={emojis}
+              channelId={video.channel_id}
+              channelEmojis={channelEmojis}
             />
           </Stack>
         </Table.Td>

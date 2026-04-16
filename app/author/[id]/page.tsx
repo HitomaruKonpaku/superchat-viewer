@@ -3,7 +3,7 @@
 import { Anchor, Divider, Group, Image, Menu, Stack, Table, Tabs, Text } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { useParams } from 'next/navigation'
-import { useContext, useEffect, useRef, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { BackButton } from '../../../components/BackButton/BackButton'
 import { ChatActionRenderer } from '../../../components/ChatAction/ChatActionRenderer'
 import { CommonChatRenderer } from '../../../components/ChatRenderer/CommonChatRenderer'
@@ -21,7 +21,7 @@ import { YoutubeChannelButton } from '../../../components/YoutubeChannelButton/Y
 import { api } from '../../../src/api'
 import { cfg } from '../../../src/cfg'
 import { EMOJI_DEFAULT_CHANNELS } from '../../../src/constant/emoji.constant'
-import { Emoji } from '../../../src/interface/emoji.interface'
+import { ChannelEmojiContext } from '../../../src/provider/channel-emoji.provider'
 import { SearchParamsContext } from '../../../src/provider/search-params.provider'
 import { ArrayUtil } from '../../../src/util/array.util'
 import { BitUtil } from '../../../src/util/bit.util'
@@ -29,13 +29,12 @@ import { SuperChatUtil } from '../../../src/util/superchat.util'
 
 export default function AuthorPage() {
   const { searchParams, applyParams } = useContext(SearchParamsContext)
+  const { channelEmojis, addItems } = useContext(ChannelEmojiContext)
 
   const [backUrl] = useState('/channels')
   const [pollInterval] = useState(cfg.author.chat.pollInterval)
   const id = useParams().id?.toString() as string
   const [author, setAuthor] = useState<any>(null)
-  const [channelEmojis, setChannelEmojis] = useState<Map<string, Emoji[]>>(new Map())
-  const channelEmojisRef = useRef(new Map<string, Emoji[]>())
 
   const [defaultTab] = useState('sc')
   const [activeTab, setActiveTab] = useState<string>(searchParams.get('tab') || defaultTab)
@@ -76,18 +75,14 @@ export default function AuthorPage() {
       return
     }
 
-    const url = 'emojis'
+    const url = 'channel-emojis'
     try {
       const { data } = await api.get(url, {
         params: {
           channel_id: channelIds.join(','),
         },
       })
-      const { items } = data
-      channelIds.forEach((channelId) => {
-        channelEmojisRef.current.set(channelId, items.filter((v: Emoji) => v.channel_id === channelId))
-      })
-      setChannelEmojis(channelEmojisRef.current)
+      addItems(data.items)
     } catch (error: any) {
       console.warn(error.message)
     }
@@ -122,20 +117,12 @@ export default function AuthorPage() {
       ...new Set(data.items.map((v: any) => v.channel_id)),
       ...EMOJI_DEFAULT_CHANNELS,
     ]
-    const curChannelIds = channelEmojisRef.current.keys().toArray()
+    const curChannelIds = channelEmojis.keys().toArray()
     const newChannelIds = ArrayUtil.difference(activeChannelIds, curChannelIds) as string[]
     initEmojis(newChannelIds)
   }
 
   function toRow(element: Record<string, any>, index: number, limit: number, page: number) {
-    const rowChannelIds = [
-      element.channel_id,
-      ...EMOJI_DEFAULT_CHANNELS,
-    ]
-    const rowEmojis = rowChannelIds
-      .map(id => channelEmojis.get(id) || [])
-      .flat() as Emoji[]
-
     return (
       <Table.Tr key={element.id}>
         <Table.Td ta='right'>
@@ -207,7 +194,8 @@ export default function AuthorPage() {
 
             <ChatActionRenderer
               value={element}
-              emojis={rowEmojis}
+              channelId={element.channel_id}
+              channelEmojis={channelEmojis}
             />
           </Stack>
         </Table.Td>

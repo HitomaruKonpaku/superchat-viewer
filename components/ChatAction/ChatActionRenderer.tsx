@@ -1,14 +1,15 @@
 import { Divider, Group, Image, Menu, Text } from '@mantine/core'
 import { IconGiftFilled, IconStarFilled } from '@tabler/icons-react'
 import { useEffect, useState } from 'react'
-import { Emoji } from '../../src/interface/emoji.interface'
+import { ChannelEmojis } from '../../src/interface/emoji.interface'
 import { EmojiUtil } from '../../src/util/emoji.util'
 import ChatMessage from '../ChatMessage/ChatMessage'
 import MenuItemCopy from '../menu-item/MenuItemCopy'
 
 interface IProps {
   value: any
-  emojis?: Emoji[]
+  channelId?: string
+  channelEmojis?: ChannelEmojis
 }
 
 export function ChatActionRenderer(props: IProps) {
@@ -83,7 +84,8 @@ export function ChatActionRenderer(props: IProps) {
                 <Menu.Target>
                   <ChatMessage
                     message={element.message}
-                    emojis={props.emojis}
+                    channelId={props.channelId}
+                    channelEmojis={props.channelEmojis}
                   />
                 </Menu.Target>
 

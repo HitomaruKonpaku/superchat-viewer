@@ -6,3 +6,5 @@ export interface Emoji {
   shortcuts: string[]
   thumbnails: Thumbnail[]
 }
+
+export type ChannelEmojis = Map<string, Map<string, Thumbnail>>
