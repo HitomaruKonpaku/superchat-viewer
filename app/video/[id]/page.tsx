@@ -1,6 +1,6 @@
 'use client'
 
-import { Anchor, Divider, Group, Image, Menu, Stack, Table, Text, Tooltip } from '@mantine/core'
+import { Anchor, Divider, Group, Menu, Stack, Table, Text, Tooltip } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { IconStarFilled } from '@tabler/icons-react'
 import { useParams } from 'next/navigation'
@@ -9,6 +9,7 @@ import { BackButton } from '../../../components/BackButton/BackButton'
 import { ChatActionRenderer } from '../../../components/ChatAction/ChatActionRenderer'
 import { SuperChatRenderer } from '../../../components/ChatRenderer/SuperChatRenderer'
 import { DateTimeText } from '../../../components/DateTimeText/DateTimeText'
+import { BaseImage } from '../../../components/Emoji/BaseImage'
 import MenuItemAppAuthorChat from '../../../components/menu-item/MenuItemAppAuthorChat'
 import MenuItemAppVideo from '../../../components/menu-item/MenuItemAppChannel'
 import MenuItemCopy from '../../../components/menu-item/MenuItemCopy'
@@ -103,12 +104,12 @@ export default function VideoPage() {
             <Group gap={8}>
               {
                 element.author_photo &&
-                <Image
+                <BaseImage
                   src={element.author_photo}
+                  alt='thumbnail'
                   w={40}
                   h={40}
                   radius='sm'
-                  referrerPolicy='no-referrer'
                 />
               }
 

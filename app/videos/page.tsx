@@ -1,10 +1,11 @@
 'use client'
 
-import { Anchor, Center, Group, Image, Menu, Stack, Table, Text, Tooltip } from '@mantine/core'
+import { Anchor, Center, Group, Menu, Stack, Table, Text, Tooltip } from '@mantine/core'
 import { useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { BackButton } from '../../components/BackButton/BackButton'
 import { DateTimeText } from '../../components/DateTimeText/DateTimeText'
+import { BaseImage } from '../../components/Emoji/BaseImage'
 import { IconBoolean } from '../../components/icon/IconBoolean'
 import { IconMembersOnly } from '../../components/icon/IconMembersOnly'
 import MenuItemAppSuperChat from '../../components/menu-item/MenuItemAppSuperChat'
@@ -55,12 +56,12 @@ export default function VideoListPage() {
         <Table.Td p={0}>
           <Anchor href={`/video/${element.id}`} h='100%'>
             <Center>
-              <Image
+              <BaseImage
                 src={VideoUtil.toThumbnailMq(element.id)}
+                alt='thumbnail'
                 maw={320}
                 mah={180}
                 radius='sm'
-                referrerPolicy='no-referrer'
               />
             </Center>
           </Anchor>

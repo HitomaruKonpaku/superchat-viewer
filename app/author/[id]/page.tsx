@@ -1,6 +1,6 @@
 'use client'
 
-import { Anchor, Divider, Group, Image, Menu, Stack, Table, Tabs, Text } from '@mantine/core'
+import { Anchor, Divider, Group, Menu, Stack, Table, Tabs, Text } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { useParams } from 'next/navigation'
 import { useContext, useEffect, useState } from 'react'
@@ -9,6 +9,7 @@ import { ChatActionRenderer } from '../../../components/ChatAction/ChatActionRen
 import { CommonChatRenderer } from '../../../components/ChatRenderer/CommonChatRenderer'
 import { SuperChatRenderer } from '../../../components/ChatRenderer/SuperChatRenderer'
 import { DateTimeText } from '../../../components/DateTimeText/DateTimeText'
+import { BaseImage } from '../../../components/Emoji/BaseImage'
 import MenuItemAppAuthorChat from '../../../components/menu-item/MenuItemAppAuthorChat'
 import MenuItemAppVideo from '../../../components/menu-item/MenuItemAppChannel'
 import MenuItemAppSuperChat from '../../../components/menu-item/MenuItemAppSuperChat'
@@ -134,12 +135,12 @@ export default function AuthorPage() {
             <Group gap={8}>
               {
                 element.channel_thumbnail_url &&
-                <Image
+                <BaseImage
                   src={element.channel_thumbnail_url}
+                  alt='thumbnail'
                   w={40}
                   h={40}
                   radius='sm'
-                  referrerPolicy='no-referrer'
                 />
               }
 

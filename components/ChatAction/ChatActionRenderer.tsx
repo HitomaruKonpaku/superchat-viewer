@@ -1,9 +1,10 @@
-import { Divider, Group, Image, Menu, Text } from '@mantine/core'
+import { Divider, Group, Menu, Text } from '@mantine/core'
 import { IconGiftFilled, IconStarFilled } from '@tabler/icons-react'
 import { useEffect, useState } from 'react'
 import { ChannelEmojis } from '../../src/interface/emoji.interface'
 import { EmojiUtil } from '../../src/util/emoji.util'
 import ChatMessage from '../ChatMessage/ChatMessage'
+import { BaseImage } from '../Emoji/BaseImage'
 import MenuItemCopy from '../menu-item/MenuItemCopy'
 
 interface IProps {
@@ -46,11 +47,11 @@ export function ChatActionRenderer(props: IProps) {
                 }
                 {
                   element.membership_thumbnail &&
-                  <Image
+                  <BaseImage
                     src={element.membership_thumbnail}
+                    alt='membership_thumbnail'
                     w={20}
                     h={20}
-                    referrerPolicy='no-referrer'
                   />
                 }
               </Group>

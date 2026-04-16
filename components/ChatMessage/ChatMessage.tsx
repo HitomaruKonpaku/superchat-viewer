@@ -1,8 +1,9 @@
-import { Box, Image, Text, Tooltip } from '@mantine/core'
+import { Box, Text, Tooltip } from '@mantine/core'
 import { memo, useMemo } from 'react'
 import { EMOJI_DEFAULT_CHANNELS } from '../../src/constant/emoji.constant'
 import { ChannelEmojis } from '../../src/interface/emoji.interface'
 import { Thumbnail } from '../../src/interface/thumbnail.interface'
+import { EmojiImage } from '../Emoji/EmojiImage'
 
 type IProps = {
   message: string
@@ -99,13 +100,12 @@ function ChatMessageComponent({ message, channelId, channelEmojis }: IProps) {
                   key={index}
                   label={run.value}
                 >
-                  <Image
+                  <EmojiImage
                     src={thumbnail.url}
+                    alt={run.value}
                     w={thumbnail.width}
                     h={thumbnail.height}
                     mx={1}
-                    alt={run.value}
-                    referrerPolicy='no-referrer'
                     style={{ display: 'inline-block', verticalAlign: 'middle' }}
                   />
                 </Tooltip>
