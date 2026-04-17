@@ -3,8 +3,9 @@
 import { Anchor, Center, Group, Menu, Stack, Table, Text, Tooltip } from '@mantine/core'
 import { useParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { AuthorPageButton } from '../../../components/AuthorPageButton/AuthorPageButton'
-import { BackButton } from '../../../components/BackButton/BackButton'
+import { AuthorPageButton } from '../../../components/Button/AuthorPageButton'
+import { BackButton } from '../../../components/Button/BackButton'
+import { YoutubeChannelButton } from '../../../components/Button/YoutubeChannelButton'
 import { DateTimeText } from '../../../components/DateTimeText/DateTimeText'
 import { BaseImage } from '../../../components/Emoji/BaseImage'
 import { IconBoolean } from '../../../components/icon/IconBoolean'
@@ -15,7 +16,6 @@ import MenuItemHolodexVideo from '../../../components/menu-item/MenuItemHolodexV
 import MenuItemYoutubeVideo from '../../../components/menu-item/MenuItemYoutubeVideo'
 import PaginationTable from '../../../components/PaginationTable/PaginationTable'
 import { PrivacyStatusText } from '../../../components/PrivacyStatusText/PrivacyStatusText'
-import { YoutubeChannelButton } from '../../../components/YoutubeChannelButton/YoutubeChannelButton'
 import { api } from '../../../src/api'
 import { cfg } from '../../../src/cfg'
 import { VideoUtil } from '../../../src/util/video.util'
@@ -119,7 +119,7 @@ export default function ChannelPage() {
               <Text>{channel?.name}</Text>
             </Tooltip>
           </>}
-      </Group >
+      </Group>
 
       <PaginationTable
         apiPath='videos'

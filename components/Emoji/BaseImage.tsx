@@ -16,5 +16,5 @@ export const BaseImage = forwardRef<HTMLImageElement, BaseProps>(
         {...others}
       />
     )
-  }
+  },
 )

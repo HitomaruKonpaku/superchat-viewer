@@ -15,6 +15,7 @@ export default defineConfig([
     rules: {
       'semi': ['error', 'never'],
       'quotes': ['error', 'single'],
+      'comma-dangle': ['error', 'always-multiline'],
       '@typescript-eslint/no-explicit-any': 'off',
     },
   },

@@ -27,12 +27,12 @@ export async function generateMetadata(
       openGraph: {
         title: author.name,
         description: author.description,
-        url: `${appUrl}/author/${id}`
+        url: `${appUrl}/author/${id}`,
       },
       twitter: {
         title: author.name,
         description: author.description,
-        site: `${appUrl}/author/${id}`
+        site: `${appUrl}/author/${id}`,
       },
     }
   } catch (error) {

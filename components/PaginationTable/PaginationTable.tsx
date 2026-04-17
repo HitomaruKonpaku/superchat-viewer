@@ -51,7 +51,7 @@ export default function PaginationTable(props: IProps) {
     mode: 'uncontrolled',
     initialValues: {
       search: searchParams.get('q') || '',
-    }
+    },
   })
 
   useEffect(() => {

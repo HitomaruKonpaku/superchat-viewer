@@ -10,23 +10,28 @@ export const cfg = {
 
   channel: {
     limit: 20,
-    pollInterval: ms('60s')
+    pollInterval: ms('60s'),
   },
 
   video: {
     limit: 50,
-    pollInterval: ms('60s')
-  },
+    pollInterval: ms('60s'),
 
-  superchat: {
-    limit: 500,
-    pollInterval: ms('30s')
+    schat: {
+      limit: 500,
+      pollInterval: ms('30s'),
+    },
+
+    chat: {
+      limit: 100,
+      pollInterval: ms('60s'),
+    },
   },
 
   author: {
     chat: {
       limit: 100,
-      pollInterval: ms('60s')
-    }
+      pollInterval: ms('60s'),
+    },
   },
 }

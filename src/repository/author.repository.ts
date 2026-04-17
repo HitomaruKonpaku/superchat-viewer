@@ -5,6 +5,12 @@ import { IPagination } from '../interface/pagination.interface'
 import { NumberUtil } from '../util/number.util'
 import { QueryUtil } from '../util/query.util'
 
+function verifyId(id: string) {
+  if (!id) {
+    throw new Error('AUTHOR_ID_NOT_FOUND')
+  }
+}
+
 export async function getAuthorById(id: string) {
   'use cache'
   cacheLife('minutes')
@@ -36,17 +42,15 @@ export async function getAuthorSuperChats(
   'use cache'
   cacheLife('minutes')
 
+  verifyId(authorId)
+
   if (!opts.types.length) {
     return { total: 0, items: [] }
   }
 
-  if (!authorId) {
-    throw new Error('AUTHOR_ID_NOT_FOUND')
-  }
-
   const queryBase = db.createQueryBuilder()
     .from('youtube_chat_action', 'yca')
-    .leftJoinAndSelect('youtube_video', 'yv', 'yv.id = yca.video_id')
+    .leftJoin('youtube_video', 'yv', 'yv.id = yca.video_id')
     .andWhere('author_channel_id = :authorId', { authorId })
     .andWhere('type IN (:...types)', { types: opts.types })
 
@@ -102,9 +106,7 @@ export async function getAuthorSuperChatTypes(
   'use cache'
   cacheLife('minutes')
 
-  if (!authorId) {
-    throw new Error('AUTHOR_ID_NOT_FOUND')
-  }
+  verifyId(authorId)
 
   const query = `
 SELECT type,
@@ -129,9 +131,7 @@ export async function getAuthorSuperChatColors(
   'use cache'
   cacheLife('minutes')
 
-  if (!authorId) {
-    throw new Error('AUTHOR_ID_NOT_FOUND')
-  }
+  verifyId(authorId)
 
   const query = `
 WITH sig AS (
@@ -178,9 +178,7 @@ export async function getAuthorBaseChats(
   'use cache'
   cacheLife('minutes')
 
-  if (!authorId) {
-    throw new Error('AUTHOR_ID_NOT_FOUND')
-  }
+  verifyId(authorId)
 
   const types = [
     'addChatItemAction',

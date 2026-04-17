@@ -12,5 +12,5 @@ api.interceptors.request.use(
   (req) => {
     // console.log('request', axios.getUri(req))
     return req
-  }
+  },
 )

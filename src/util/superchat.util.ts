@@ -54,7 +54,7 @@ export class SuperChatUtil {
       : Number(initValue)
     const types = SuperChatUtil.OPTIONS.map(option => ({
       ...option,
-      checked: !!(mask & (1 << option.id))
+      checked: !!(mask & (1 << option.id)),
     }))
     return { types }
   }

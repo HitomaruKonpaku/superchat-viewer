@@ -12,17 +12,17 @@ export async function getChannels(opts: IPagination) {
 
   const queryBase = db.createQueryBuilder()
     .from('youtube_channel', 'yc')
-    .leftJoinAndSelect('user_pool', 'up', 'up.source_id = yc.id')
+    .leftJoin('user_pool', 'up', 'up.source_id = yc.id')
     .andWhere(new Brackets((b0) => b0
       .orWhere('source_type ISNULL')
-      .orWhere('source_type = :source_type', { source_type: 'YOUTUBE' })
+      .orWhere('source_type = :source_type', { source_type: 'YOUTUBE' }),
     ))
 
   if (opts.query) {
     queryBase.andWhere(new Brackets((b0) => b0
       .orWhere('yc.id ILIKE :query', { query: `%${opts.query}%` })
       .orWhere('yc.custom_url ILIKE :query')
-      .orWhere('yc.name ILIKE :query')
+      .orWhere('yc.name ILIKE :query'),
     ))
   }
 

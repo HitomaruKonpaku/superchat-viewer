@@ -2,9 +2,9 @@ import { Divider, Group, Menu, Text } from '@mantine/core'
 import { IconGiftFilled, IconStarFilled } from '@tabler/icons-react'
 import { useEffect, useState } from 'react'
 import { EmojiUtil } from '../../src/util/emoji.util'
-import ChatMessage from '../ChatMessage/ChatMessage'
 import { BaseImage } from '../Emoji/BaseImage'
 import MenuItemCopy from '../menu-item/MenuItemCopy'
+import ChatMessage from './ChatMessage'
 
 interface IProps {
   value: any

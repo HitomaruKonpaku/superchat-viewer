@@ -9,8 +9,6 @@ export async function getEmojis(channelIds: string[]) {
     .select('id')
     .addSelect('channel_id')
     .addSelect('shortcuts')
-    // .addSelect('search_terms')
-    // .addSelect(`image #>> '{accessibility,accessibilityData,label}'`, 'label')
     // eslint-disable-next-line quotes
     .addSelect(`image -> 'thumbnails'`, 'thumbnails')
     .from('youtube_chat_emoji', 'yce')

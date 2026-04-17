@@ -4,10 +4,12 @@ import { Anchor, Divider, Group, Menu, Stack, Table, Tabs, Text } from '@mantine
 import { useForm } from '@mantine/form'
 import { useParams } from 'next/navigation'
 import { useContext, useEffect, useState } from 'react'
-import { BackButton } from '../../../components/BackButton/BackButton'
-import { ChatActionRenderer } from '../../../components/ChatAction/ChatActionRenderer'
-import { CommonChatRenderer } from '../../../components/ChatRenderer/CommonChatRenderer'
-import { SuperChatRenderer } from '../../../components/ChatRenderer/SuperChatRenderer'
+import { BackButton } from '../../../components/Button/BackButton'
+import { ChannelPageButton } from '../../../components/Button/ChannelPageButton'
+import { YoutubeChannelButton } from '../../../components/Button/YoutubeChannelButton'
+import { ChatActionRenderer } from '../../../components/Chat/ChatActionRenderer'
+import { CommonChatRenderer } from '../../../components/Chat/ChatRenderer/CommonChatRenderer'
+import { SuperChatRenderer } from '../../../components/Chat/ChatRenderer/SuperChatRenderer'
 import { DateTimeText } from '../../../components/DateTimeText/DateTimeText'
 import { BaseImage } from '../../../components/Emoji/BaseImage'
 import MenuItemAppAuthorChat from '../../../components/menu-item/MenuItemAppAuthorChat'
@@ -18,7 +20,6 @@ import MenuItemHolodexChannel from '../../../components/menu-item/MenuItemHolode
 import MenuItemHolodexVideo from '../../../components/menu-item/MenuItemHolodexVideo'
 import MenuItemYoutubeChannel from '../../../components/menu-item/MenuItemYoutubeChannel'
 import MenuItemYoutubeVideo from '../../../components/menu-item/MenuItemYoutubeVideo'
-import { YoutubeChannelButton } from '../../../components/YoutubeChannelButton/YoutubeChannelButton'
 import { api } from '../../../src/api'
 import { cfg } from '../../../src/cfg'
 import { EMOJI_DEFAULT_CHANNELS } from '../../../src/constant/emoji.constant'
@@ -130,7 +131,7 @@ export default function AuthorPage() {
           <Text size='sm'>{(index + 1) + (limit * (page - 1))}</Text>
         </Table.Td>
 
-        <Table.Td >
+        <Table.Td>
           <Stack gap={2}>
             <Group gap={8}>
               {
@@ -207,6 +208,7 @@ export default function AuthorPage() {
     <>
       <Group gap={8} ml={8} mt={8}>
         <BackButton url={backUrl} />
+        <ChannelPageButton id={id} />
         <YoutubeChannelButton id={id} />
         <Text>{author?.name}</Text>
       </Group>

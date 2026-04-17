@@ -29,7 +29,7 @@ export const EmojiImage = forwardRef<HTMLImageElement, EmojiImageProps>(
           'public',
           'emoji',
           '24',
-          id
+          id,
         ].join('/')
 
         fallbackSrcRef.current = url.href
@@ -45,5 +45,5 @@ export const EmojiImage = forwardRef<HTMLImageElement, EmojiImageProps>(
         {...props}
       />
     )
-  }
+  },
 )

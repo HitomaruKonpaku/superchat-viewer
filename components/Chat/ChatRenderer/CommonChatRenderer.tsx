@@ -2,7 +2,7 @@
 
 import { Stack, Table } from '@mantine/core'
 import { JSX } from 'react'
-import PaginationTable from '../PaginationTable/PaginationTable'
+import PaginationTable from '../../PaginationTable/PaginationTable'
 
 interface IProps {
   listApiPath: string

@@ -56,7 +56,7 @@ export const ChannelEmojiProvider = ({ children }: { children: any }) => {
   return (
     <ChannelEmojiContext.Provider value={{
       channelEmojis: valueRef.current,
-      addItems
+      addItems,
     }}>
       {children}
     </ChannelEmojiContext.Provider>

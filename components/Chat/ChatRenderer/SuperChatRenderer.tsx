@@ -3,10 +3,10 @@
 import { Stack, Table } from '@mantine/core'
 import { UseFormReturnType } from '@mantine/form'
 import { JSX } from 'react'
-import { ChatActionFormValue } from '../../src/interface/superchat.interface'
-import { ChatActionTypeSelector } from '../ChatAction/ChatActionTypeSelector'
-import { ChatColorSelector } from '../ChatColor/ChatColorSelector'
-import PaginationTable from '../PaginationTable/PaginationTable'
+import { ChatActionFormValue } from '../../../src/interface/superchat.interface'
+import PaginationTable from '../../PaginationTable/PaginationTable'
+import { ChatActionTypeSelector } from '../ChatActionTypeSelector'
+import { ChatColorSelector } from '../ChatColorSelector'
 
 interface IProps {
   listApiPath: string

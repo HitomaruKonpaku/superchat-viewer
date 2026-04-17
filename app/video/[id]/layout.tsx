@@ -3,7 +3,6 @@ import { env } from 'next-runtime-env'
 import Head from 'next/head'
 import { fetchWithTimeout } from '../../../src/util/fetch.util'
 import { VideoUtil } from '../../../src/util/video.util'
-import VideoPage from './page'
 
 export function generateViewport(): Viewport {
   return {
@@ -50,7 +49,13 @@ export async function generateMetadata(
 }
 
 export default async function Layout(
-  { params }: { params: Promise<any> },
+  {
+    params,
+    children,
+  }: {
+    params: Promise<any>
+    children: React.ReactNode
+  },
 ) {
   const appUrl = env('APP_URL')
   const apiUrl = env('API_URL')
@@ -74,7 +79,7 @@ export default async function Layout(
           <meta property='twitter:image' content={VideoUtil.toThumbnailMaxRes(id)} />
         </Head>
 
-        <VideoPage />
+        {children}
       </>
     )
   } catch (error) {
@@ -83,7 +88,7 @@ export default async function Layout(
 
   return (
     <>
-      <VideoPage />
+      {children}
     </>
   )
 }

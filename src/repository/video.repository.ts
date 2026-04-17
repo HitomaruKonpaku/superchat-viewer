@@ -6,6 +6,12 @@ import { IPagination } from '../interface/pagination.interface'
 import { NumberUtil } from '../util/number.util'
 import { QueryUtil } from '../util/query.util'
 
+function verifyId(id: string) {
+  if (!id) {
+    throw new Error('VIDEO_ID_NOT_FOUND')
+  }
+}
+
 export async function getVideos(opts: IPagination & { channelId?: string }) {
   'use cache'
   cacheLife('minutes')
@@ -20,7 +26,7 @@ export async function getVideos(opts: IPagination & { channelId?: string }) {
   if (opts.query) {
     queryBase.andWhere(new Brackets((b0) => b0
       .orWhere('id ILIKE :query', { query: `%${opts.query}%` })
-      .orWhere('title ILIKE :query')
+      .orWhere('title ILIKE :query'),
     ))
   }
 
@@ -83,12 +89,10 @@ export async function getVideoSuperChats(
   'use cache'
   cacheLife('minutes')
 
+  verifyId(videoId)
+
   if (!opts.types.length) {
     return { total: 0, items: [] }
-  }
-
-  if (!videoId) {
-    throw new Error('VIDEO_ID_NOT_FOUND')
   }
 
   const queryBase = db.createQueryBuilder()
@@ -158,9 +162,7 @@ export async function getVideoSuperChatTypes(
   'use cache'
   cacheLife('minutes')
 
-  if (!videoId) {
-    throw new Error('VIDEO_ID_NOT_FOUND')
-  }
+  verifyId(videoId)
 
   const query = `
 SELECT type,
@@ -185,9 +187,7 @@ export async function getVideoSuperChatColors(
   'use cache'
   cacheLife('minutes')
 
-  if (!videoId) {
-    throw new Error('VIDEO_ID_NOT_FOUND')
-  }
+  verifyId(videoId)
 
   const query = `
 WITH sig AS (
@@ -225,4 +225,69 @@ ORDER BY s.id
   })
 
   return { total: items.length, items }
+}
+
+export async function getVideoBaseChats(
+  videoId: string,
+  opts: IPagination,
+) {
+  'use cache'
+  cacheLife('minutes')
+
+  verifyId(videoId)
+
+  const types = [
+    'addChatItemAction',
+    // 'addSuperChatItemAction',
+  ]
+
+  const createChatQueryBuilder = (tableName: string) => db.createQueryBuilder()
+    .select('id')
+    .addSelect('created_at')
+    .addSelect('author_channel_id')
+    .addSelect('author_name')
+    .addSelect('author_photo')
+    .addSelect('is_owner')
+    .addSelect('is_moderator')
+    .addSelect('is_verified')
+    .addSelect('message')
+    .from(tableName, 'yca')
+    .andWhere('video_id = :videoId', { videoId })
+    .andWhere('type IN (:...types)', { types })
+
+  const queryItem = db.createQueryBuilder()
+    .addCommonTableExpression(
+      createChatQueryBuilder('youtube_chat_action'),
+      'yca_1',
+    )
+    .addCommonTableExpression(
+      createChatQueryBuilder('youtube_chat_action_chat'),
+      'yca_2',
+    )
+    .addCommonTableExpression(
+      '(SELECT * FROM yca_1) UNION ALL (SELECT * FROM yca_2)',
+      'yca',
+    )
+    .addCommonTableExpression(
+      'SELECT COUNT(*) AS _total FROM yca',
+      'total',
+    )
+    .select('yca.*')
+    .addSelect('tt.*')
+    .from('yca', 'yca')
+    .leftJoin('total', 'tt', 'TRUE')
+    .addOrderBy('yca."created_at"', 'ASC')
+    .limit(opts.limit)
+    .offset(opts.offset)
+
+  const { rows: items } = await pool.query(...queryItem.getQueryAndParameters())
+  let total = 0
+
+  items.forEach((item) => {
+    item.created_at = NumberUtil.parse(item.created_at)
+    total = total || Number(item._total)
+    delete item._total
+  })
+
+  return { total, items }
 }

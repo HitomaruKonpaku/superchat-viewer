@@ -6,7 +6,12 @@ import { useRouter } from 'next/navigation'
 import { useContext } from 'react'
 import { SearchParamsContext } from '../../src/provider/search-params.provider'
 
-export function BackButton({ url, defaultUrl }: { url?: string, defaultUrl?: string }) {
+interface IProps {
+  url?: string
+  defaultUrl?: string
+}
+
+export function BackButton({ url, defaultUrl }: IProps) {
   const router = useRouter()
   const { clearParams: clearParams } = useContext(SearchParamsContext)
 
@@ -25,9 +30,20 @@ export function BackButton({ url, defaultUrl }: { url?: string, defaultUrl?: str
   }
 
   return (
-    <Tooltip label='Back'>
-      <ActionIcon variant='light' size='xl' radius='xl' aria-label='Back' onClick={onClick}>
-        <IconArrowBack style={{ width: '70%', height: '70%' }} stroke={1.5} />
+    <Tooltip
+      label='Back'
+    >
+      <ActionIcon
+        variant='light'
+        size='xl'
+        radius='xl'
+        aria-label='Back'
+        onClick={onClick}
+      >
+        <IconArrowBack
+          style={{ width: '70%', height: '70%' }}
+          stroke={1.5}
+        />
       </ActionIcon>
     </Tooltip>
   )

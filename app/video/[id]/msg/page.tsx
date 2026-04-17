@@ -1,47 +1,32 @@
 'use client'
 
 import { Anchor, Divider, Group, Menu, Stack, Table, Text, Tooltip } from '@mantine/core'
-import { useForm } from '@mantine/form'
 import { IconStarFilled } from '@tabler/icons-react'
 import { useParams } from 'next/navigation'
 import { useContext, useEffect, useState } from 'react'
-import { BackButton } from '../../../components/Button/BackButton'
-import { YoutubeVideoButton } from '../../../components/Button/YoutubeVideoButton'
-import { ChatActionRenderer } from '../../../components/Chat/ChatActionRenderer'
-import { SuperChatRenderer } from '../../../components/Chat/ChatRenderer/SuperChatRenderer'
-import { DateTimeText } from '../../../components/DateTimeText/DateTimeText'
-import { BaseImage } from '../../../components/Emoji/BaseImage'
-import MenuItemAppAuthorChat from '../../../components/menu-item/MenuItemAppAuthorChat'
-import MenuItemAppVideo from '../../../components/menu-item/MenuItemAppChannel'
-import MenuItemCopy from '../../../components/menu-item/MenuItemCopy'
-import MenuItemHolodexChannel from '../../../components/menu-item/MenuItemHolodexChannel'
-import MenuItemYoutubeChannel from '../../../components/menu-item/MenuItemYoutubeChannel'
-import { api } from '../../../src/api'
-import { cfg } from '../../../src/cfg'
-import { EMOJI_DEFAULT_CHANNELS } from '../../../src/constant/emoji.constant'
-import { ChannelEmojiContext } from '../../../src/provider/channel-emoji.provider'
-import { SearchParamsContext } from '../../../src/provider/search-params.provider'
-import { BitUtil } from '../../../src/util/bit.util'
-import { SuperChatUtil } from '../../../src/util/superchat.util'
+import { BackButton } from '../../../../components/Button/BackButton'
+import { YoutubeVideoButton } from '../../../../components/Button/YoutubeVideoButton'
+import { ChatActionRenderer } from '../../../../components/Chat/ChatActionRenderer'
+import { CommonChatRenderer } from '../../../../components/Chat/ChatRenderer/CommonChatRenderer'
+import { DateTimeText } from '../../../../components/DateTimeText/DateTimeText'
+import { BaseImage } from '../../../../components/Emoji/BaseImage'
+import MenuItemAppAuthorChat from '../../../../components/menu-item/MenuItemAppAuthorChat'
+import MenuItemAppVideo from '../../../../components/menu-item/MenuItemAppChannel'
+import MenuItemCopy from '../../../../components/menu-item/MenuItemCopy'
+import MenuItemHolodexChannel from '../../../../components/menu-item/MenuItemHolodexChannel'
+import MenuItemYoutubeChannel from '../../../../components/menu-item/MenuItemYoutubeChannel'
+import { api } from '../../../../src/api'
+import { cfg } from '../../../../src/cfg'
+import { EMOJI_DEFAULT_CHANNELS } from '../../../../src/constant/emoji.constant'
+import { ChannelEmojiContext } from '../../../../src/provider/channel-emoji.provider'
 
 export default function VideoPage() {
-  const { searchParams, applyParams } = useContext(SearchParamsContext)
   const { addItems } = useContext(ChannelEmojiContext)
 
   const [backUrl, setBackUrl] = useState('/channels')
-  const [pollInterval, setPollInterval] = useState(cfg.video.schat.pollInterval)
+  const [pollInterval, setPollInterval] = useState(cfg.video.chat.pollInterval)
   const id = useParams().id?.toString() as string
   const [video, setVideo] = useState<any>(null)
-
-  const form = useForm({
-    mode: 'uncontrolled',
-    initialValues: SuperChatUtil.getInitialValues(searchParams.get('types')),
-    transformValues: SuperChatUtil.getTransformValues,
-    onValuesChange: (value) => {
-      const types = SuperChatUtil.getTypesParam(BitUtil.fromBoolsToNumber(value.types.map(v => v.checked).reverse()))
-      applyParams({ types, p: null })
-    },
-  })
 
   //#region data
 
@@ -54,6 +39,7 @@ export default function VideoPage() {
     }
 
     load()
+    setBackUrl(`/video/${id}`)
   }, [id])
 
   async function initData() {
@@ -62,7 +48,6 @@ export default function VideoPage() {
       const { data } = await api.get(url)
       document.title = data.title
       setVideo(data)
-      setBackUrl(`/channel/${data.channel_id}`)
       if (data.actual_end) {
         setPollInterval(0)
       }
@@ -164,17 +149,13 @@ export default function VideoPage() {
         </Tooltip>
       </Group>
 
-      <SuperChatRenderer
-        listApiPath={`videos/${id}/schats`}
-        listApiParams={{ ...form.getTransformedValues() }}
-        statsTypesApiPath={`videos/${id}/stats/types`}
-        statsColorsApiPath={`videos/${id}/stats/colors`}
-        form={form}
-        limit={cfg.video.schat.limit}
+      <CommonChatRenderer
+        listApiPath={`videos/${id}/chats`}
+        limit={cfg.video.chat.limit}
         pollInterval={pollInterval}
         toRow={toRow}
       >
-      </SuperChatRenderer>
+      </CommonChatRenderer>
     </>
   )
 }
