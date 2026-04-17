@@ -196,7 +196,6 @@ export default function AuthorPage() {
             <ChatActionRenderer
               value={element}
               channelId={element.channel_id}
-              channelEmojis={channelEmojis}
             />
           </Stack>
         </Table.Td>

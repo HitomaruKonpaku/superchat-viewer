@@ -1,14 +1,13 @@
 import { Box, Text, Tooltip } from '@mantine/core'
-import { memo, useMemo } from 'react'
+import { memo, useContext, useMemo } from 'react'
 import { EMOJI_DEFAULT_CHANNELS } from '../../src/constant/emoji.constant'
-import { ChannelEmojis } from '../../src/interface/emoji.interface'
 import { Thumbnail } from '../../src/interface/thumbnail.interface'
+import { ChannelEmojiContext } from '../../src/provider/channel-emoji.provider'
 import { EmojiImage } from '../Emoji/EmojiImage'
 
 type IProps = {
   message: string
   channelId?: string
-  channelEmojis?: ChannelEmojis
 }
 
 type ChatMessageRun = {
@@ -67,7 +66,9 @@ function extractEmojiTokens(msg: string): Set<string> {
   return tokens
 }
 
-function ChatMessageComponent({ message, channelId, channelEmojis }: IProps) {
+function ChatMessageComponent({ message, channelId }: IProps) {
+  const { channelEmojis } = useContext(ChannelEmojiContext)
+
   const emojiTokens = useMemo(() => extractEmojiTokens(message), [message])
 
   const runs = useMemo(() => buildRuns(message, emojiTokens), [message, emojiTokens])

@@ -1,8 +1,10 @@
-import { cacheLife } from 'next/dist/server/use-cache/cache-life'
+import { cacheLife } from 'next/cache'
 import { notFound } from 'next/navigation'
 import { Brackets } from 'typeorm'
 import { db, pool } from '../db'
 import { IPagination } from '../interface/pagination.interface'
+import { NumberUtil } from '../util/number.util'
+import { QueryUtil } from '../util/query.util'
 
 export async function getChannels(opts: IPagination) {
   'use cache'
@@ -27,7 +29,8 @@ export async function getChannels(opts: IPagination) {
   const queryCount = queryBase
     .select('COUNT(*)')
 
-  const { rows: [{ count }] } = await pool.query(...queryCount.getQueryAndParameters())
+  const total = await pool.query(...queryCount.getQueryAndParameters())
+    .then(QueryUtil.toTotal)
 
   const queryItem = db.createQueryBuilder()
     .addCommonTableExpression(
@@ -63,8 +66,13 @@ export async function getChannels(opts: IPagination) {
     .from('tmp_youtube_channel', 'c')
     .leftJoin('tmp_stats', 's', 's.id = c.id')
 
-  const { rows } = await pool.query(...queryItem.getQueryAndParameters())
-  return { total: Number(count), items: rows }
+  const { rows: items } = await pool.query(...queryItem.getQueryAndParameters())
+  items.forEach(item => {
+    item.created_at = NumberUtil.parse(item.created_at)
+    item.video_count = NumberUtil.parse(item.video_count)
+  })
+
+  return { total, items }
 }
 
 export async function getChannelById(id: string) {
@@ -80,5 +88,10 @@ export async function getChannelById(id: string) {
     notFound()
   }
 
-  return rows[0]
+  const item = rows[0]
+  item.created_at = NumberUtil.parse(item.created_at)
+  item.updated_at = NumberUtil.parse(item.created_at)
+  item.modified_at = NumberUtil.parse(item.created_at)
+
+  return item
 }

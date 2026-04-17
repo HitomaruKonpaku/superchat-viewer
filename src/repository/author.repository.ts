@@ -1,14 +1,16 @@
-import { cacheLife } from 'next/dist/server/use-cache/cache-life'
+import { cacheLife } from 'next/cache'
 import { notFound } from 'next/navigation'
 import { db, pool } from '../db'
 import { IPagination } from '../interface/pagination.interface'
+import { NumberUtil } from '../util/number.util'
+import { QueryUtil } from '../util/query.util'
 
 export async function getAuthorById(id: string) {
   'use cache'
   cacheLife('minutes')
 
   const query = db.createQueryBuilder()
-    .addSelect('author_channel_id', 'id')
+    .select('author_channel_id', 'id')
     .addSelect('author_name', 'name')
     .addSelect('author_photo', 'photo')
     .from('youtube_chat_action', 'yca')
@@ -21,7 +23,8 @@ export async function getAuthorById(id: string) {
     notFound()
   }
 
-  return rows[0]
+  const item = rows[0]
+  return item
 }
 
 export async function getAuthorSuperChats(
@@ -50,7 +53,8 @@ export async function getAuthorSuperChats(
   const queryCount = queryBase
     .select('COUNT(*)')
 
-  const { rows: [{ count }] } = await pool.query(...queryCount.getQueryAndParameters())
+  const total = await pool.query(...queryCount.getQueryAndParameters())
+    .then(QueryUtil.toTotal)
 
   const queryItem = queryBase
     .select('yca.id')
@@ -78,13 +82,18 @@ END
     .addSelect('yc.custom_url', 'channel_custom_url')
     .addSelect('yc.name', 'channel_name')
     .addSelect('yc.thumbnail_url', 'channel_thumbnail_url')
-    .leftJoinAndSelect('youtube_channel', 'yc', 'yc.id = yv.channel_id')
+    .leftJoin('youtube_channel', 'yc', 'yc.id = yv.channel_id')
     .addOrderBy('yca."created_at"', 'DESC')
     .limit(opts.limit)
     .offset(opts.offset)
 
-  const { rows } = await pool.query(...queryItem.getQueryAndParameters())
-  return { total: Number(count), items: rows }
+  const { rows: items } = await pool.query(...queryItem.getQueryAndParameters())
+  items.forEach(item => {
+    item.created_at = NumberUtil.parse(item.created_at)
+    item.amount = NumberUtil.parse(item.amount)
+  })
+
+  return { total, items }
 }
 
 export async function getAuthorSuperChatTypes(
@@ -106,10 +115,9 @@ GROUP BY type
 ORDER BY type
   `
 
-  const { rows } = await pool.query(query, [authorId])
-  const items = rows.map(v => {
-    v.count = Number(v.count)
-    return v
+  const { rows: items } = await pool.query(query, [authorId])
+  items.forEach(item => {
+    item.count = NumberUtil.parse(item.count)
   })
 
   return { total: items.length, items }
@@ -155,10 +163,9 @@ FROM sig AS s
 ORDER BY s.id
   `
 
-  const { rows } = await pool.query(query, [authorId])
-  const items = rows.map(v => {
-    v.count = Number(v.count)
-    return v
+  const { rows: items } = await pool.query(query, [authorId])
+  items.forEach(item => {
+    item.count = NumberUtil.parse(item.count)
   })
 
   return { total: items.length, items }
@@ -227,13 +234,13 @@ export async function getAuthorBaseChats(
     .limit(opts.limit)
     .offset(opts.offset)
 
-  const { rows } = await pool.query(...queryItem.getQueryAndParameters())
+  const { rows: items } = await pool.query(...queryItem.getQueryAndParameters())
   let total = 0
-  const items = rows.map((v) => {
-    v.created_at = Number(v.created_at)
-    total = total || Number(v._total)
-    delete v._total
-    return v
+
+  items.forEach((item) => {
+    item.created_at = NumberUtil.parse(item.created_at)
+    total = total || Number(item._total)
+    delete item._total
   })
 
   return { total, items }

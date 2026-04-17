@@ -1,8 +1,10 @@
-import { cacheLife } from 'next/dist/server/use-cache/cache-life'
+import { cacheLife } from 'next/cache'
 import { notFound } from 'next/navigation'
 import { Brackets } from 'typeorm'
 import { db, pool } from '../db'
 import { IPagination } from '../interface/pagination.interface'
+import { NumberUtil } from '../util/number.util'
+import { QueryUtil } from '../util/query.util'
 
 export async function getVideos(opts: IPagination & { channelId?: string }) {
   'use cache'
@@ -25,7 +27,8 @@ export async function getVideos(opts: IPagination & { channelId?: string }) {
   const queryCount = queryBase
     .select('COUNT(*)')
 
-  const { rows: [{ count }] } = await pool.query(...queryCount.getQueryAndParameters())
+  const total = await pool.query(...queryCount.getQueryAndParameters())
+    .then(QueryUtil.toTotal)
 
   const queryItem = queryBase
     .select('id')
@@ -39,8 +42,12 @@ export async function getVideos(opts: IPagination & { channelId?: string }) {
     .limit(opts.limit)
     .offset(opts.offset)
 
-  const { rows } = await pool.query(...queryItem.getQueryAndParameters())
-  return { total: Number(count), items: rows }
+  const { rows: items } = await pool.query(...queryItem.getQueryAndParameters())
+  items.forEach(item => {
+    item.created_at = NumberUtil.parse(item.created_at)
+  })
+
+  return { total, items }
 }
 
 export async function getVideoById(id: string) {
@@ -56,7 +63,15 @@ export async function getVideoById(id: string) {
     notFound()
   }
 
-  return rows[0]
+  const item = rows[0]
+  item.created_at = NumberUtil.parse(item.created_at)
+  item.updated_at = NumberUtil.parse(item.created_at)
+  item.modified_at = NumberUtil.parse(item.created_at)
+  item.scheduled_start = NumberUtil.parse(item.scheduled_start)
+  item.actual_start = NumberUtil.parse(item.actual_start)
+  item.actual_end = NumberUtil.parse(item.actual_end)
+
+  return item
 }
 
 export async function getVideoSuperChats(
@@ -84,7 +99,8 @@ export async function getVideoSuperChats(
   const queryCount = queryBase
     .select('COUNT(*)')
 
-  const { rows: [{ count }] } = await pool.query(...queryCount.getQueryAndParameters())
+  const total = await pool.query(...queryCount.getQueryAndParameters())
+    .then(QueryUtil.toTotal)
 
   const queryItem = db.createQueryBuilder()
     .addCommonTableExpression(queryBase.select('*'), 'yca')
@@ -126,8 +142,14 @@ END
     .limit(opts.limit)
     .offset(opts.offset)
 
-  const { rows } = await pool.query(...queryItem.getQueryAndParameters())
-  return { total: Number(count), items: rows }
+  const { rows: items } = await pool.query(...queryItem.getQueryAndParameters())
+  items.forEach(item => {
+    item.created_at = NumberUtil.parse(item.created_at)
+    item.amount = NumberUtil.parse(item.amount)
+    item.sc_counter = NumberUtil.parse(item.sc_counter)
+  })
+
+  return { total, items }
 }
 
 export async function getVideoSuperChatTypes(
@@ -149,10 +171,9 @@ GROUP BY type
 ORDER BY type
   `
 
-  const { rows } = await pool.query(query, [videoId])
-  const items = rows.map(v => {
-    v.count = Number(v.count)
-    return v
+  const { rows: items } = await pool.query(query, [videoId])
+  items.forEach(item => {
+    item.count = NumberUtil.parse(item.count)
   })
 
   return { total: items.length, items }
@@ -198,10 +219,9 @@ FROM sig AS s
 ORDER BY s.id
   `
 
-  const { rows } = await pool.query(query, [videoId])
-  const items = rows.map(v => {
-    v.count = Number(v.count)
-    return v
+  const { rows: items } = await pool.query(query, [videoId])
+  items.forEach(item => {
+    item.count = NumberUtil.parse(item.count)
   })
 
   return { total: items.length, items }

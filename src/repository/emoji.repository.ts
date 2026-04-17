@@ -13,7 +13,7 @@ export async function getEmojis(channelIds: string[]) {
     // .addSelect(`image #>> '{accessibility,accessibilityData,label}'`, 'label')
     // eslint-disable-next-line quotes
     .addSelect(`image -> 'thumbnails'`, 'thumbnails')
-    .from('youtube_chat_emoji', 'e')
+    .from('youtube_chat_emoji', 'yce')
 
   if (channelIds.length) {
     query.andWhere('channel_id IN (:...channelIds)', { channelIds })
@@ -27,24 +27,24 @@ export async function getChannelEmojis(channelIds: string[]) {
   'use cache'
   cacheLife('minutes')
 
-  if (!channelIds.length) {
-    return { total: 0, items: [] }
+  const query = db.createQueryBuilder()
+    .select('channel_id')
+    .addSelect(`
+      json_agg(
+        json_build_object(
+          'id', id,
+          'shortcuts', shortcuts,
+          'thumbnails', image -> 'thumbnails'
+        )
+      )
+      `, 'emojis')
+    .from('youtube_chat_emoji', 'yce')
+    .groupBy('channel_id')
+
+  if (channelIds.length) {
+    query.andWhere('channel_id IN (:...channelIds)', { channelIds })
   }
 
-  const query = `
-SELECT channel_id,
-  json_agg(
-    json_build_object(
-      'id', id,
-      'shortcuts', shortcuts,
-      'thumbnails', image -> 'thumbnails'
-    )
-  ) AS emojis
-FROM youtube_chat_emoji AS yce
-WHERE channel_id = ANY($1)
-GROUP BY channel_id
-  `
-
-  const { rows: items } = await pool.query(query, [channelIds])
+  const { rows: items } = await pool.query(...query.getQueryAndParameters())
   return { total: items.length, items }
 }

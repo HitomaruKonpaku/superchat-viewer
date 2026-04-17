@@ -26,7 +26,7 @@ import { SuperChatUtil } from '../../../src/util/superchat.util'
 
 export default function VideoPage() {
   const { searchParams, applyParams } = useContext(SearchParamsContext)
-  const { channelEmojis, addItems } = useContext(ChannelEmojiContext)
+  const { addItems } = useContext(ChannelEmojiContext)
 
   const [backUrl, setBackUrl] = useState('/channels')
   const [pollInterval, setPollInterval] = useState(cfg.superchat.pollInterval)
@@ -145,8 +145,7 @@ export default function VideoPage() {
 
             <ChatActionRenderer
               value={element}
-              channelId={video.channel_id}
-              channelEmojis={channelEmojis}
+              channelId={video?.channel_id}
             />
           </Stack>
         </Table.Td>
