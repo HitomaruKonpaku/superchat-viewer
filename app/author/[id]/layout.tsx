@@ -1,8 +1,8 @@
 import { Metadata, Viewport } from 'next'
 import { env } from 'next-runtime-env'
 import Head from 'next/head'
+import { LayoutProps } from '../../../src/interface/layout.interface'
 import { fetchWithTimeout } from '../../../src/util/fetch.util'
-import AuthorPage from './page'
 
 export function generateViewport(): Viewport {
   return {
@@ -13,9 +13,9 @@ export function generateViewport(): Viewport {
 export async function generateMetadata(
   { params }: { params: Promise<any> },
 ): Promise<Metadata> {
+  const { id } = await params
   const appUrl = env('APP_URL')
   const apiUrl = env('API_URL')
-  const { id } = await params
 
   try {
     const author = await fetchWithTimeout(`${apiUrl}/authors/${id}`)
@@ -42,12 +42,10 @@ export async function generateMetadata(
   return {}
 }
 
-export default async function Layout(
-  { params }: { params: Promise<any> },
-) {
+export default async function Layout({ params, children }: LayoutProps) {
+  const { id } = await params
   const appUrl = env('APP_URL')
   const apiUrl = env('API_URL')
-  const { id } = await params
 
   try {
     const author = await fetchWithTimeout(`${apiUrl}/authors/${id}`)
@@ -65,7 +63,7 @@ export default async function Layout(
           <meta property='twitter:image' content={author.photo} />
         </Head>
 
-        <AuthorPage />
+        {children}
       </>
     )
   } catch (error) {
@@ -74,7 +72,7 @@ export default async function Layout(
 
   return (
     <>
-      <AuthorPage />
+      {children}
     </>
   )
 }

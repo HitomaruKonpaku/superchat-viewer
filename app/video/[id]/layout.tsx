@@ -1,6 +1,7 @@
 import { Metadata, Viewport } from 'next'
 import { env } from 'next-runtime-env'
 import Head from 'next/head'
+import { LayoutProps } from '../../../src/interface/layout.interface'
 import { fetchWithTimeout } from '../../../src/util/fetch.util'
 import { VideoUtil } from '../../../src/util/video.util'
 
@@ -13,9 +14,9 @@ export function generateViewport(): Viewport {
 export async function generateMetadata(
   { params }: { params: Promise<any> },
 ): Promise<Metadata> {
+  const { id } = await params
   const appUrl = env('APP_URL')
   const apiUrl = env('API_URL')
-  const { id } = await params
 
   try {
     const video = await fetchWithTimeout(`${apiUrl}/videos/${id}`)
@@ -48,18 +49,10 @@ export async function generateMetadata(
   return {}
 }
 
-export default async function Layout(
-  {
-    params,
-    children,
-  }: {
-    params: Promise<any>
-    children: React.ReactNode
-  },
-) {
+export default async function Layout({ params, children }: LayoutProps) {
+  const { id } = await params
   const appUrl = env('APP_URL')
   const apiUrl = env('API_URL')
-  const { id } = await params
 
   try {
     const video = await fetchWithTimeout(`${apiUrl}/videos/${id}`)
