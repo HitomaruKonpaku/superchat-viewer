@@ -104,8 +104,8 @@ function ChatMessageComponent({ message, channelId }: IProps) {
                   <EmojiImage
                     src={thumbnail.url}
                     alt={run.value}
-                    w={thumbnail.width}
-                    h={thumbnail.height}
+                    w={24}
+                    h={24}
                     mx={1}
                     style={{ display: 'inline-block', verticalAlign: 'middle' }}
                   />

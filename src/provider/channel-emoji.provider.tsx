@@ -38,7 +38,7 @@ export const ChannelEmojiProvider = ({ children }: { children: any }) => {
         return
       }
 
-      const thumbnail = emoji.thumbnails?.find(v => v)
+      const thumbnail = emoji.thumbnails[1] || emoji.thumbnails[0]
       if (!thumbnail) {
         return
       }
