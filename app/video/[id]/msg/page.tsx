@@ -1,15 +1,16 @@
 'use client'
 
-import { Anchor, Divider, Group, Menu, Stack, Table, Text, Tooltip } from '@mantine/core'
+import { Anchor, Divider, Flex, Group, Menu, Stack, Table, Text, Tooltip } from '@mantine/core'
 import { IconStarFilled } from '@tabler/icons-react'
 import { useParams } from 'next/navigation'
 import { useContext, useEffect, useState } from 'react'
 import { BackButton } from '../../../../components/Button/BackButton'
 import { YoutubeVideoButton } from '../../../../components/Button/YoutubeVideoButton'
 import { ChatActionRenderer } from '../../../../components/Chat/ChatActionRenderer'
+import { ChatMembershipBadge } from '../../../../components/Chat/ChatMembershipBadge'
 import { CommonChatRenderer } from '../../../../components/Chat/ChatRenderer/CommonChatRenderer'
 import { DateTimeText } from '../../../../components/DateTimeText/DateTimeText'
-import { BaseImage } from '../../../../components/Emoji/BaseImage'
+import { ChannelImage } from '../../../../components/Image/ChannelImage'
 import MenuItemAppAuthorChat from '../../../../components/menu-item/MenuItemAppAuthorChat'
 import MenuItemAppVideo from '../../../../components/menu-item/MenuItemAppChannel'
 import MenuItemCopy from '../../../../components/menu-item/MenuItemCopy'
@@ -89,34 +90,32 @@ export default function VideoPage() {
             <Group gap={8}>
               {
                 element.author_photo &&
-                <BaseImage
-                  src={element.author_photo}
-                  alt='thumbnail'
-                  w={40}
-                  h={40}
-                  radius='sm'
-                />
+                <ChannelImage src={element.author_photo} />
               }
 
               <Stack gap={2} flex={1}>
-                <Menu position='bottom-start'>
-                  <Menu.Target>
-                    <Anchor underline='never'>
-                      <Text ta='justify'>{element.author_name}</Text>
-                    </Anchor>
-                  </Menu.Target>
+                <Flex gap={6}>
+                  <ChatMembershipBadge membership={element.membership} />
 
-                  <Menu.Dropdown>
-                    <MenuItemYoutubeChannel id={element.author_channel_id} />
-                    <MenuItemHolodexChannel id={element.author_channel_id} />
-                    <Menu.Divider />
-                    <MenuItemAppVideo id={element.author_channel_id} />
-                    <MenuItemAppAuthorChat id={element.author_channel_id} />
-                    <Menu.Divider />
-                    <MenuItemCopy value={element.author_channel_id} label='Copy ID' />
-                    <MenuItemCopy value={element.author_name} label='Copy name' />
-                  </Menu.Dropdown>
-                </Menu>
+                  <Menu position='bottom-start'>
+                    <Menu.Target>
+                      <Anchor underline='never'>
+                        <Text ta='justify'>{element.author_name}</Text>
+                      </Anchor>
+                    </Menu.Target>
+
+                    <Menu.Dropdown>
+                      <MenuItemYoutubeChannel id={element.author_channel_id} />
+                      <MenuItemHolodexChannel id={element.author_channel_id} />
+                      <Menu.Divider />
+                      <MenuItemAppVideo id={element.author_channel_id} />
+                      <MenuItemAppAuthorChat id={element.author_channel_id} />
+                      <Menu.Divider />
+                      <MenuItemCopy value={element.author_channel_id} label='Copy ID' />
+                      <MenuItemCopy value={element.author_name} label='Copy name' />
+                    </Menu.Dropdown>
+                  </Menu>
+                </Flex>
 
                 <DateTimeText
                   value={element.created_at}
@@ -140,7 +139,7 @@ export default function VideoPage() {
 
   return (
     <>
-      <Group gap={8} ml={8} mt={8}>
+      <Group gap={8} mx={8} mt={8}>
         <BackButton url={backUrl} />
         <YoutubeVideoButton id={id} />
         {video?.is_members_only && <Tooltip label='Members only'><IconStarFilled color='lime' size={16} /></Tooltip>}

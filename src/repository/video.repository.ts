@@ -122,10 +122,11 @@ export async function getVideoSuperChats(
     // .addSelect('yca.type')
     .addSelect(`
 CASE
-  WHEN type = 'addSuperChatItemAction'         THEN 1
-  WHEN type = 'addMembershipItemAction'        THEN 2
-  WHEN type = 'membershipGiftPurchaseAction'   THEN 4
-  WHEN type = 'membershipGiftRedemptionAction' THEN 8
+  WHEN type = 'addSuperChatItemAction'           THEN 1
+  WHEN type = 'addMembershipItemAction'          THEN 2
+  WHEN type = 'addMembershipMilestoneItemAction' THEN 4
+  WHEN type = 'membershipGiftPurchaseAction'     THEN 8
+  WHEN type = 'membershipGiftRedemptionAction'   THEN 16
   ELSE -1
 END
       `, 'type')
@@ -137,7 +138,7 @@ END
     .addSelect('yca.amount')
     .addSelect('yca.color')
     .addSelect('yca.level')
-    // .addSelect(`yca.membership ->> 'thumbnail'`, 'membership_thumbnail')
+    .addSelect('yca.membership')
     .addSelect('yca.sender_name')
     .addSelect('sc.sc_counter')
     .from('yca', 'yca')
@@ -251,6 +252,7 @@ export async function getVideoBaseChats(
     .addSelect('is_moderator')
     .addSelect('is_verified')
     .addSelect('message')
+    .addSelect('membership')
     .from(tableName, 'yca')
     .andWhere('video_id = :videoId', { videoId })
     .andWhere('type IN (:...types)', { types })

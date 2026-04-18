@@ -1,6 +1,6 @@
 'use client'
 
-import { Anchor, Divider, Group, Menu, Stack, Table, Text, Tooltip } from '@mantine/core'
+import { Anchor, Divider, Flex, Group, Menu, Stack, Table, Text, Tooltip } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { IconStarFilled } from '@tabler/icons-react'
 import { useParams } from 'next/navigation'
@@ -8,9 +8,11 @@ import { useContext, useEffect, useState } from 'react'
 import { BackButton } from '../../../components/Button/BackButton'
 import { YoutubeVideoButton } from '../../../components/Button/YoutubeVideoButton'
 import { ChatActionRenderer } from '../../../components/Chat/ChatActionRenderer'
+import { ChatMembershipBadge } from '../../../components/Chat/ChatMembershipBadge'
 import { SuperChatRenderer } from '../../../components/Chat/ChatRenderer/SuperChatRenderer'
 import { DateTimeText } from '../../../components/DateTimeText/DateTimeText'
-import { BaseImage } from '../../../components/Emoji/BaseImage'
+import { BaseImage } from '../../../components/Image/BaseImage'
+import { ChannelImage } from '../../../components/Image/ChannelImage'
 import MenuItemAppAuthorChat from '../../../components/menu-item/MenuItemAppAuthorChat'
 import MenuItemAppVideo from '../../../components/menu-item/MenuItemAppChannel'
 import MenuItemCopy from '../../../components/menu-item/MenuItemCopy'
@@ -20,11 +22,13 @@ import { api } from '../../../src/api'
 import { cfg } from '../../../src/cfg'
 import { EMOJI_DEFAULT_CHANNELS } from '../../../src/constant/emoji.constant'
 import { ChannelEmojiContext } from '../../../src/provider/channel-emoji.provider'
+import { ConfigContext } from '../../../src/provider/config.provider'
 import { SearchParamsContext } from '../../../src/provider/search-params.provider'
 import { BitUtil } from '../../../src/util/bit.util'
 import { SuperChatUtil } from '../../../src/util/superchat.util'
 
 export default function VideoPage() {
+  const { sus } = useContext(ConfigContext)
   const { searchParams, applyParams } = useContext(SearchParamsContext)
   const { addItems } = useContext(ChannelEmojiContext)
 
@@ -104,34 +108,32 @@ export default function VideoPage() {
             <Group gap={8}>
               {
                 element.author_photo &&
-                <BaseImage
-                  src={element.author_photo}
-                  alt='thumbnail'
-                  w={40}
-                  h={40}
-                  radius='sm'
-                />
+                <ChannelImage src={element.author_photo} />
               }
 
               <Stack gap={2} flex={1}>
-                <Menu position='bottom-start'>
-                  <Menu.Target>
-                    <Anchor underline='never'>
-                      <Text ta='justify'>{element.author_name}</Text>
-                    </Anchor>
-                  </Menu.Target>
+                <Flex gap={6}>
+                  <ChatMembershipBadge membership={element.membership} />
 
-                  <Menu.Dropdown>
-                    <MenuItemYoutubeChannel id={element.author_channel_id} />
-                    <MenuItemHolodexChannel id={element.author_channel_id} />
-                    <Menu.Divider />
-                    <MenuItemAppVideo id={element.author_channel_id} />
-                    <MenuItemAppAuthorChat id={element.author_channel_id} />
-                    <Menu.Divider />
-                    <MenuItemCopy value={element.author_channel_id} label='Copy ID' />
-                    <MenuItemCopy value={element.author_name} label='Copy name' />
-                  </Menu.Dropdown>
-                </Menu>
+                  <Menu position='bottom-start'>
+                    <Menu.Target>
+                      <Anchor underline='never'>
+                        <Text ta='justify'>{element.author_name}</Text>
+                      </Anchor>
+                    </Menu.Target>
+
+                    <Menu.Dropdown>
+                      <MenuItemYoutubeChannel id={element.author_channel_id} />
+                      <MenuItemHolodexChannel id={element.author_channel_id} />
+                      <Menu.Divider />
+                      <MenuItemAppVideo id={element.author_channel_id} />
+                      <MenuItemAppAuthorChat id={element.author_channel_id} />
+                      <Menu.Divider />
+                      <MenuItemCopy value={element.author_channel_id} label='Copy ID' />
+                      <MenuItemCopy value={element.author_name} label='Copy name' />
+                    </Menu.Dropdown>
+                  </Menu>
+                </Flex>
 
                 <DateTimeText
                   value={element.created_at}
@@ -155,13 +157,33 @@ export default function VideoPage() {
 
   return (
     <>
-      <Group gap={8} ml={8} mt={8}>
+      <Group gap={8} mx={8} mt={8}>
         <BackButton url={backUrl} />
         <YoutubeVideoButton id={id} />
         {video?.is_members_only && <Tooltip label='Members only'><IconStarFilled color='lime' size={16} /></Tooltip>}
         <Tooltip label={video?.description} disabled={!video?.description} multiline>
           <Text>{video?.title}</Text>
         </Tooltip>
+
+        {
+          sus &&
+          <Flex
+            flex={1}
+            justify='end'
+          >
+            <Anchor
+              href={`/video/${id}/msg`}
+              underline='never'
+            >
+              <BaseImage
+                src={'/img/poyoyo-sus.png'}
+                w={32}
+                h={32}
+              >
+              </BaseImage>
+            </Anchor>
+          </Flex>
+        }
       </Group>
 
       <SuperChatRenderer

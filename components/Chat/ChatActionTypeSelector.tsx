@@ -1,4 +1,4 @@
-import { Checkbox, Flex } from '@mantine/core'
+import { Checkbox, Flex, Text, Tooltip } from '@mantine/core'
 import { UseFormReturnType } from '@mantine/form'
 import { useMounted } from '@mantine/hooks'
 import { BaseSyntheticEvent, useContext, useEffect, useRef } from 'react'
@@ -24,7 +24,7 @@ export function ChatActionTypeSelector(props: IProps) {
 
   const allChecked = !!types.length && types.every((item) => item.checked)
   const allIndeterminate = !!types.length && !allChecked && types.some((item) => item.checked)
-  const allCount = types.reduce((sum, item) => sum + item.count, 0)
+  const allCount = types.reduce((sum, item) => sum + (item.count || 0), 0)
   const allLabel = `ALL (${allCount})`
 
   useEffect(() => {
@@ -133,7 +133,7 @@ export function ChatActionTypeSelector(props: IProps) {
     <>
       {
         props.form &&
-        <Flex gap='md' wrap='wrap' mx='md' my={0}>
+        <Flex gap='md' wrap='wrap' mx='md' my={0} align='center'>
           <Checkbox
             label={allLabel}
             checked={allChecked}
@@ -144,11 +144,20 @@ export function ChatActionTypeSelector(props: IProps) {
 
           {
             types.map((item, index: number) => (
+              !item.hidden
+              &&
               <Checkbox
                 key={item.key || index}
-                label={getItemLabel(item)}
+                label={
+                  <Tooltip label={item.key}>
+                    <Text size='sm'>{getItemLabel(item)}</Text>
+                  </Tooltip>
+                }
                 checked={item.checked}
                 disabled={loading}
+                styles={{
+                  body: { alignItems: 'center' },
+                }}
                 onChange={(ev) => onItemChange(ev, index)}
               />
             ))

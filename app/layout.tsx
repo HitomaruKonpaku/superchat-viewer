@@ -1,12 +1,9 @@
 import '@mantine/core/styles.css'
 
 import { ColorSchemeScript, mantineHtmlProps, MantineProvider, Stack } from '@mantine/core'
-import { Suspense } from 'react'
 import { Scroller } from '../components/Scroller/Scroller'
-import { ChannelEmojiProvider } from '../src/provider/channel-emoji.provider'
-import { LoadingProvider } from '../src/provider/loading.provider'
-import { SearchParamsProvider } from '../src/provider/search-params.provider'
 import { theme } from '../theme'
+import { Providers } from './provider'
 
 export const metadata = {
   // title: 'Mantine Next.js template',
@@ -33,17 +30,11 @@ export default function RootLayout({ children }: { children: any }) {
 
       <body>
         <MantineProvider theme={theme} defaultColorScheme='dark' forceColorScheme='dark'>
-          <LoadingProvider>
-            <Suspense>
-              <SearchParamsProvider>
-                <ChannelEmojiProvider>
-                  <Stack maw={1280} m='auto' mt={8}>
-                    {children}
-                  </Stack>
-                </ChannelEmojiProvider>
-              </SearchParamsProvider>
-            </Suspense>
-          </LoadingProvider>
+          <Providers>
+            <Stack maw={1280} m='auto' mt={8}>
+              {children}
+            </Stack>
+          </Providers>
           <Scroller />
         </MantineProvider>
       </body>

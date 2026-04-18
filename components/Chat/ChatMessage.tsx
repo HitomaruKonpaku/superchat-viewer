@@ -1,14 +1,15 @@
-import { Box, Text, Tooltip } from '@mantine/core'
-import { memo, useContext, useMemo } from 'react'
+import { Box, Text, Tooltip, UnstyledButton } from '@mantine/core'
+import { ComponentProps, memo, useContext, useMemo } from 'react'
 import { EMOJI_DEFAULT_CHANNELS } from '../../src/constant/emoji.constant'
 import { Thumbnail } from '../../src/interface/thumbnail.interface'
 import { ChannelEmojiContext } from '../../src/provider/channel-emoji.provider'
-import { EmojiImage } from '../Emoji/EmojiImage'
+import { EmojiImage } from '../Image/EmojiImage'
 
-type IProps = {
-  message: string
-  channelId?: string
-}
+type IProps = ComponentProps<'button'>
+  & {
+    message: string
+    channelId?: string
+  }
 
 type ChatMessageRun = {
   type: 'text' | 'emoji'
@@ -66,7 +67,7 @@ function extractEmojiTokens(msg: string): Set<string> {
   return tokens
 }
 
-function ChatMessageComponent({ message, channelId }: IProps) {
+function ChatMessageComponent({ message, channelId, ...others }: IProps) {
   const { channelEmojis } = useContext(ChannelEmojiContext)
 
   const emojiTokens = useMemo(() => extractEmojiTokens(message), [message])
@@ -74,42 +75,55 @@ function ChatMessageComponent({ message, channelId }: IProps) {
   const runs = useMemo(() => buildRuns(message, emojiTokens), [message, emojiTokens])
 
   return (
-    <Box
-      ta={'justify'}
-      style={{ wordBreak: 'break-word' }}
+    <UnstyledButton
+      {...others}
     >
-      {
-        runs.map((run, index) => {
-          if (run.type === 'emoji') {
-            let thumbnail: Thumbnail | undefined
+      <Box
+        ta={'justify'}
+        style={{ wordBreak: 'break-word' }}
+      >
+        {
+          runs.map((run, index) => {
+            if (run.type === 'emoji') {
+              let thumbnail: Thumbnail | undefined
 
-            if (channelId) {
-              thumbnail = channelEmojis?.get(channelId)?.get(run.value)
-              if (!thumbnail) {
-                for (const key of EMOJI_DEFAULT_CHANNELS) {
-                  thumbnail = channelEmojis?.get(key)?.get(run.value)
-                  if (thumbnail) {
-                    break
+              if (channelId) {
+                thumbnail = channelEmojis?.get(channelId)?.get(run.value)
+                if (!thumbnail) {
+                  for (const key of EMOJI_DEFAULT_CHANNELS) {
+                    thumbnail = channelEmojis?.get(key)?.get(run.value)
+                    if (thumbnail) {
+                      break
+                    }
                   }
                 }
               }
-            }
 
-            if (thumbnail) {
+              if (thumbnail) {
+                return (
+                  <Tooltip
+                    key={index}
+                    label={run.value}
+                  >
+                    <EmojiImage
+                      src={thumbnail.url}
+                      alt={run.value}
+                      w={24}
+                      h={24}
+                      mx={1}
+                      style={{ display: 'inline-block', verticalAlign: 'middle' }}
+                    />
+                  </Tooltip>
+                )
+              }
+
               return (
-                <Tooltip
+                <Text
                   key={index}
-                  label={run.value}
-                >
-                  <EmojiImage
-                    src={thumbnail.url}
-                    alt={run.value}
-                    w={24}
-                    h={24}
-                    mx={1}
-                    style={{ display: 'inline-block', verticalAlign: 'middle' }}
-                  />
-                </Tooltip>
+                  mx={1}
+                  span
+                  style={{ verticalAlign: 'middle' }}
+                >{run.value}</Text>
               )
             }
 
@@ -121,19 +135,10 @@ function ChatMessageComponent({ message, channelId }: IProps) {
                 style={{ verticalAlign: 'middle' }}
               >{run.value}</Text>
             )
-          }
-
-          return (
-            <Text
-              key={index}
-              mx={1}
-              span
-              style={{ verticalAlign: 'middle' }}
-            >{run.value}</Text>
-          )
-        })
-      }
-    </Box>
+          })
+        }
+      </Box>
+    </UnstyledButton>
   )
 }
 

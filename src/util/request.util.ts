@@ -19,6 +19,7 @@ export class RequestUtil {
     const allTypes = [
       'addSuperChatItemAction',
       'addMembershipItemAction',
+      'addMembershipMilestoneItemAction',
       'membershipGiftPurchaseAction',
       'membershipGiftRedemptionAction',
     ]

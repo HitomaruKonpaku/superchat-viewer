@@ -3,7 +3,8 @@ export interface ChatTypeOption {
   key: string
   label: string
   checked: boolean
-  count: number
+  hidden?: boolean
+  count?: number
 }
 
 export interface ChatActionFormValue {

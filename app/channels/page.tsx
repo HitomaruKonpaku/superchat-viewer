@@ -3,7 +3,7 @@
 import { Anchor, Center, Group, Menu, Stack, Table, Text } from '@mantine/core'
 import { useState } from 'react'
 import { DateTimeText } from '../../components/DateTimeText/DateTimeText'
-import { BaseImage } from '../../components/Emoji/BaseImage'
+import { ChannelImage } from '../../components/Image/ChannelImage'
 import PaginationTable from '../../components/PaginationTable/PaginationTable'
 import { IconBoolean } from '../../components/icon/IconBoolean'
 import MenuItemAppAuthorChat from '../../components/menu-item/MenuItemAppAuthorChat'
@@ -26,12 +26,10 @@ export default function ChannelListPage() {
         <Table.Td p={0}>
           <Anchor href={`/channel/${element.id}`}>
             <Center>
-              <BaseImage
+              <ChannelImage
                 src={element.thumbnail_url}
-                alt='thumbnail'
                 w={100}
                 h={100}
-                radius='sm'
               />
             </Center>
           </Anchor>

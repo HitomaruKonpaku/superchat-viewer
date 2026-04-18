@@ -7,9 +7,9 @@ import { AuthorPageButton } from '../../../components/Button/AuthorPageButton'
 import { BackButton } from '../../../components/Button/BackButton'
 import { YoutubeChannelButton } from '../../../components/Button/YoutubeChannelButton'
 import { DateTimeText } from '../../../components/DateTimeText/DateTimeText'
-import { BaseImage } from '../../../components/Emoji/BaseImage'
 import { IconBoolean } from '../../../components/icon/IconBoolean'
 import { IconMembersOnly } from '../../../components/icon/IconMembersOnly'
+import { VideoImage } from '../../../components/Image/VideoImage'
 import MenuItemAppSuperChat from '../../../components/menu-item/MenuItemAppSuperChat'
 import MenuItemCopy from '../../../components/menu-item/MenuItemCopy'
 import MenuItemHolodexVideo from '../../../components/menu-item/MenuItemHolodexVideo'
@@ -56,12 +56,8 @@ export default function ChannelPage() {
         <Table.Td p={0}>
           <Anchor href={`/video/${element.id}`} h='100%'>
             <Center>
-              <BaseImage
+              <VideoImage
                 src={VideoUtil.toThumbnailMq(element.id)}
-                alt='thumbnail'
-                maw={320}
-                mah={180}
-                radius='sm'
               />
             </Center>
           </Anchor>
@@ -108,7 +104,7 @@ export default function ChannelPage() {
 
   return (
     <>
-      <Group gap={8} ml={8} mt={8}>
+      <Group gap={8} mx={8} mt={8}>
         <BackButton url={backUrl} />
         {
           id &&

@@ -2,7 +2,7 @@ import { Divider, Group, Menu, Text } from '@mantine/core'
 import { IconGiftFilled, IconStarFilled } from '@tabler/icons-react'
 import { useEffect, useState } from 'react'
 import { EmojiUtil } from '../../src/util/emoji.util'
-import { BaseImage } from '../Emoji/BaseImage'
+import { BaseImage } from '../Image/BaseImage'
 import MenuItemCopy from '../menu-item/MenuItemCopy'
 import ChatMessage from './ChatMessage'
 
@@ -57,7 +57,14 @@ export function ChatActionRenderer(props: IProps) {
           }
 
           {
-            ['membershipGiftPurchaseAction', 4].includes(element.type) &&
+            ['addMembershipMilestoneItemAction', 4].includes(element.type) &&
+            <Group bg='#0f9d58' c='white' px={8} py={4}>
+              <Text>{element.membership.status} for {element.membership.since}</Text>
+            </Group>
+          }
+
+          {
+            ['membershipGiftPurchaseAction', 8].includes(element.type) &&
             <Group bg='#0f9d58' c='white' px={8} py={4}>
               <IconGiftFilled size={16} />
               <Text w={40} ta='right'>{element.amount}</Text>
@@ -65,7 +72,7 @@ export function ChatActionRenderer(props: IProps) {
           }
 
           {
-            ['membershipGiftRedemptionAction', 8].includes(element.type) &&
+            ['membershipGiftRedemptionAction', 16].includes(element.type) &&
             <Group bg='#0f9d58' c='white' px={8} py={4}>
               <Text>Received a gift membership{element.sender_name && <> by {element.sender_name}</>}</Text>
             </Group>
@@ -79,7 +86,7 @@ export function ChatActionRenderer(props: IProps) {
                 <Divider my={4} />
               }
 
-              <Menu position='bottom-start'>
+              <Menu position='top-start'>
                 <Menu.Target>
                   <ChatMessage
                     message={element.message}

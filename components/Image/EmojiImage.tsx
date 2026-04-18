@@ -1,5 +1,6 @@
 import { ImageProps } from '@mantine/core'
 import { ComponentPropsWithoutRef, forwardRef, useEffect, useRef } from 'react'
+import { ImageUtil } from '../../src/util/image.util'
 import { BaseImage } from './BaseImage'
 
 type EmojiImageProps = ImageProps
@@ -17,30 +18,14 @@ export const EmojiImage = forwardRef<HTMLImageElement, EmojiImageProps>(
         return
       }
 
-      try {
-        const idx = props.src.lastIndexOf('=')
-        const id = props.src
-          .substring(0, idx != -1 ? idx : props.src.length + 1)
-          .replace('https://yt3.ggpht.com/', '')
-
-        const url = new URL(location.href)
-        url.search = ''
-        url.pathname = [
-          'public',
-          'emoji',
-          '24',
-          id,
-        ].join('/')
-
-        fallbackSrcRef.current = url.href
-      } catch {
-        // ignore
-      }
+      const id = ImageUtil.parseYtId(props.src)
+      fallbackSrcRef.current = ImageUtil.getFallbackSrc('emoji', id)
     }, [props.src])
 
     return (
       <BaseImage
         ref={ref}
+        alt='emoji'
         fallbackSrc={fallbackSrcRef.current}
         {...props}
       />

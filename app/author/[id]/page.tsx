@@ -8,10 +8,11 @@ import { BackButton } from '../../../components/Button/BackButton'
 import { ChannelPageButton } from '../../../components/Button/ChannelPageButton'
 import { YoutubeChannelButton } from '../../../components/Button/YoutubeChannelButton'
 import { ChatActionRenderer } from '../../../components/Chat/ChatActionRenderer'
+import { ChatMembershipBadge } from '../../../components/Chat/ChatMembershipBadge'
 import { CommonChatRenderer } from '../../../components/Chat/ChatRenderer/CommonChatRenderer'
 import { SuperChatRenderer } from '../../../components/Chat/ChatRenderer/SuperChatRenderer'
 import { DateTimeText } from '../../../components/DateTimeText/DateTimeText'
-import { BaseImage } from '../../../components/Emoji/BaseImage'
+import { ChannelImage } from '../../../components/Image/ChannelImage'
 import MenuItemAppAuthorChat from '../../../components/menu-item/MenuItemAppAuthorChat'
 import MenuItemAppVideo from '../../../components/menu-item/MenuItemAppChannel'
 import MenuItemAppSuperChat from '../../../components/menu-item/MenuItemAppSuperChat'
@@ -134,16 +135,14 @@ export default function AuthorPage() {
         <Table.Td>
           <Stack gap={2}>
             <Group gap={8}>
-              {
-                element.channel_thumbnail_url &&
-                <BaseImage
-                  src={element.channel_thumbnail_url}
-                  alt='thumbnail'
-                  w={40}
-                  h={40}
-                  radius='sm'
-                />
-              }
+              <Stack gap={4} align='center'>
+                {
+                  element.channel_thumbnail_url &&
+                  <ChannelImage src={element.channel_thumbnail_url} />
+                }
+
+                <ChatMembershipBadge membership={element.membership} />
+              </Stack>
 
               <Stack gap={2} flex={1}>
                 <Menu position='bottom-start'>
@@ -206,7 +205,7 @@ export default function AuthorPage() {
 
   return (
     <>
-      <Group gap={8} ml={8} mt={8}>
+      <Group gap={8} mx={8} mt={8}>
         <BackButton url={backUrl} />
         <ChannelPageButton id={id} />
         <YoutubeChannelButton id={id} />
