@@ -19,7 +19,7 @@ export const BadgeImage = forwardRef<HTMLImageElement, BadgeImageProps>(
       }
 
       const id = ImageUtil.parseYtId(props.src)
-      fallbackSrcRef.current = ImageUtil.getFallbackSrc('badge', id)
+      fallbackSrcRef.current = ImageUtil.getFallbackSrc('badge', id, 32)
     }, [props.src])
 
     return (

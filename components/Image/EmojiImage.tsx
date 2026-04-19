@@ -19,7 +19,7 @@ export const EmojiImage = forwardRef<HTMLImageElement, EmojiImageProps>(
       }
 
       const id = ImageUtil.parseYtId(props.src)
-      fallbackSrcRef.current = ImageUtil.getFallbackSrc('emoji', id)
+      fallbackSrcRef.current = ImageUtil.getFallbackSrc('emoji', id, 48)
     }, [props.src])
 
     return (

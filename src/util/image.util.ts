@@ -12,7 +12,7 @@ export class ImageUtil {
     url.pathname = [
       'public',
       type,
-      size,
+      String(size).padStart(2, '0'),
       id,
     ].join('/')
     return url.href
