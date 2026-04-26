@@ -7,6 +7,7 @@ type BadgeImageProps = ImageProps
   & Omit<ComponentPropsWithoutRef<'img'>, 'alt'>
   & {
     alt?: string
+    onFallbackError?: (ev: React.SyntheticEvent<HTMLImageElement, Event>) => void
   }
 
 export const BadgeImage = forwardRef<HTMLImageElement, BadgeImageProps>(
@@ -24,8 +25,9 @@ export const BadgeImage = forwardRef<HTMLImageElement, BadgeImageProps>(
 
     const onError = (ev: React.SyntheticEvent<HTMLImageElement, Event>) => {
       const target = ev.currentTarget
+      props.onError?.(ev)
       if (fallbackSrcRef.current && target.src === fallbackSrcRef.current) {
-        target.style.display = 'none'
+        props.onFallbackError?.(ev)
       }
     }
 
