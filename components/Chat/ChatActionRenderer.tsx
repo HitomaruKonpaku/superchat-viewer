@@ -59,7 +59,7 @@ export function ChatActionRenderer(props: IProps) {
           {
             ['addMembershipMilestoneItemAction', 4].includes(element.type) &&
             <Group bg='#0f9d58' c='white' px={8} py={4}>
-              <Text>{element.membership.status} for {element.membership.since}</Text>
+              <Text>{element.membership.status} for {element.duration_text || element.membership.since}</Text>
             </Group>
           }
 

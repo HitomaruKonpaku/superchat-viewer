@@ -82,6 +82,7 @@ END
     .addSelect('yca.level')
     .addSelect('yca.membership')
     .addSelect('yca.sender_name')
+    .addSelect('yca.duration_text')
     .addSelect('yv.title', 'video_title')
     .addSelect('yc.id', 'channel_id')
     .addSelect('yc.custom_url', 'channel_custom_url')

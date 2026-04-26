@@ -22,12 +22,20 @@ export const BadgeImage = forwardRef<HTMLImageElement, BadgeImageProps>(
       fallbackSrcRef.current = ImageUtil.getFallbackSrc('badge', id, 32)
     }, [props.src])
 
+    const onError = (ev: React.SyntheticEvent<HTMLImageElement, Event>) => {
+      const target = ev.currentTarget
+      if (fallbackSrcRef.current && target.src === fallbackSrcRef.current) {
+        target.style.display = 'none'
+      }
+    }
+
     return (
       <BaseImage
         ref={ref}
         alt='badge'
         fallbackSrc={fallbackSrcRef.current}
         {...props}
+        onError={onError}
       />
     )
   },

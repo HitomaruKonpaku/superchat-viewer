@@ -100,7 +100,15 @@ export default function VideoPage() {
     return (
       <Table.Tr key={element.id}>
         <Table.Td ta='right'>
-          <Text size='sm'>{(index + 1) + (limit * (page - 1))}</Text>
+          <Menu trigger='click-hover'>
+            <Menu.Target>
+              <Text size='sm'>{(index + 1) + (limit * (page - 1))}</Text>
+            </Menu.Target>
+
+            <Menu.Dropdown>
+              <MenuItemCopy value={element.id} label='Copy ID' />
+            </Menu.Dropdown>
+          </Menu>
         </Table.Td>
 
         <Table.Td>

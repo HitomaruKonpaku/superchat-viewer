@@ -140,6 +140,7 @@ END
     .addSelect('yca.level')
     .addSelect('yca.membership')
     .addSelect('yca.sender_name')
+    .addSelect('yca.duration_text')
     .addSelect('sc.sc_counter')
     .from('yca', 'yca')
     .leftJoin('sc', 'sc', 'sc.id = yca.id')
