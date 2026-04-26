@@ -2,6 +2,7 @@
 
 import { Anchor, Divider, Flex, Group, Menu, Stack, Table, Text, Tooltip } from '@mantine/core'
 import { useForm } from '@mantine/form'
+import { useMounted } from '@mantine/hooks'
 import { IconStarFilled } from '@tabler/icons-react'
 import { useParams } from 'next/navigation'
 import { useContext, useEffect, useState } from 'react'
@@ -28,6 +29,7 @@ import { BitUtil } from '../../../src/util/bit.util'
 import { SuperChatUtil } from '../../../src/util/superchat.util'
 
 export default function VideoPage() {
+  const mounted = useMounted()
   const { sus } = useContext(ConfigContext)
   const { searchParams, applyParams } = useContext(SearchParamsContext)
   const { addItems } = useContext(ChannelEmojiContext)
@@ -174,7 +176,7 @@ export default function VideoPage() {
         </Tooltip>
 
         {
-          sus &&
+          mounted && sus &&
           <Flex
             flex={1}
             justify='end'
