@@ -19,11 +19,17 @@ export async function getChannels(opts: IPagination) {
     ))
 
   if (opts.query) {
-    queryBase.andWhere(new Brackets((b0) => b0
-      .orWhere('yc.id ILIKE :query', { query: `%${opts.query}%` })
-      .orWhere('yc.custom_url ILIKE :query')
-      .orWhere('yc.name ILIKE :query'),
-    ))
+    queryBase
+      .andWhere(new Brackets((b0) => b0
+        .orWhere('yc.id ILIKE :query', { query: `%${opts.query}%` })
+        .orWhere('yc.custom_url ILIKE :query')
+        .orWhere('yc.name ILIKE :query')
+        .orWhere('g.name ILIKE :query')
+        .orWhere('g.full_name ILIKE :query')
+        .orWhere('g.en_name ILIKE :query'),
+      ))
+      .leftJoin('group_channel', 'gc', 'gc.channel_id = yc.id AND gc.type = :gc_type', { gc_type: 'YOUTUBE' })
+      .leftJoin('group', 'g', 'g.id = gc.group_id')
   }
 
   const queryCount = queryBase
