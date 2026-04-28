@@ -213,7 +213,7 @@ export default function AuthorPage() {
 
   return (
     <>
-      <Group gap={8} mx={8} mt={8}>
+      <Group gap={8}>
         <BackButton url={backUrl} />
         <ChannelPageButton id={id} />
         <YoutubeChannelButton id={id} />

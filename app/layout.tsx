@@ -1,9 +1,10 @@
 import '@mantine/core/styles.css'
 
-import { ColorSchemeScript, mantineHtmlProps, MantineProvider, Stack } from '@mantine/core'
+import { ColorSchemeScript, mantineHtmlProps, MantineProvider } from '@mantine/core'
 import { Scroller } from '../components/Scroller/Scroller'
 import { theme } from '../theme'
 import { Providers } from './provider'
+import { Shell } from './shell'
 
 export const metadata = {
   // title: 'Mantine Next.js template',
@@ -29,11 +30,15 @@ export default function RootLayout({ children }: { children: any }) {
       </head>
 
       <body>
-        <MantineProvider theme={theme} defaultColorScheme='dark' forceColorScheme='dark'>
+        <MantineProvider
+          theme={theme}
+          defaultColorScheme='dark'
+          forceColorScheme='dark'
+        >
           <Providers>
-            <Stack maw={1280} m='auto' mt={8}>
+            <Shell>
               {children}
-            </Stack>
+            </Shell>
           </Providers>
           <Scroller />
         </MantineProvider>

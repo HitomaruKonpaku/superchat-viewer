@@ -104,7 +104,7 @@ export default function VideoListPage() {
 
   return (
     <>
-      <Group gap={8} mx={8} mt={8}>
+      <Group gap={8}>
         <BackButton url={backUrl} />
         {
           channel_id &&

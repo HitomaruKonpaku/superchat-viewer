@@ -54,7 +54,7 @@ export default function GroupListPage() {
 
         {
           group.en_name &&
-          <Badge>{group.en_name}</Badge>
+          <Badge visibleFrom='sm'>{group.en_name}</Badge>
         }
       </Group>
     </Accordion.Control>
@@ -110,7 +110,6 @@ export default function GroupListPage() {
 
   return (
     <Accordion
-      mx='sm'
       multiple
       variant='separated'
       chevronPosition='right'

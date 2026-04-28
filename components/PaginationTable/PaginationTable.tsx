@@ -1,6 +1,6 @@
 'use client'
 
-import { Button, Flex, Grid, Group, Input, Pagination, Table, Tooltip } from '@mantine/core'
+import { Button, Flex, Group, Input, Pagination, Table, Tooltip } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { useHotkeys, useMounted } from '@mantine/hooks'
 import { IconSearch, IconX } from '@tabler/icons-react'
@@ -299,37 +299,33 @@ export default function PaginationTable(props: IProps) {
 
   return (
     <>
-      <Group justify={!props.search ? 'center' : 'flex-end'} mx={8} mt={8}>
+      <Group justify={!props.search ? 'center' : 'flex-end'}>
         {
           props.search &&
           <form onSubmit={searchForm.onSubmit(onSearch)} style={{ flex: 1 }}>
-            <Grid gap='xs'>
-              <Grid.Col span={6}>
-                <Tooltip label='(F3) to focus, (F2) to unfocus'>
-                  <Input
-                    type='search'
-                    placeholder='Search'
-                    miw={200}
-                    ref={searchRef}
-                    key={searchForm.key('search')}
-                    {...searchForm.getInputProps('search')}
-                    rightSection={
-                      <Tooltip label='(ESC)'>
-                        <IconX cursor='pointer' onClick={clearSearch} />
-                      </Tooltip>
-                    }
-                    rightSectionPointerEvents='auto'
-                    onKeyDown={onSearchKeyDown}
-                  />
-                </Tooltip>
-              </Grid.Col>
+            <Flex gap={6}>
+              <Tooltip label='(F3) to focus, (F2) to unfocus'>
+                <Input
+                  type='search'
+                  placeholder='Search'
+                  miw={200}
+                  ref={searchRef}
+                  key={searchForm.key('search')}
+                  {...searchForm.getInputProps('search')}
+                  rightSection={
+                    <Tooltip label='(ESC)'>
+                      <IconX cursor='pointer' onClick={clearSearch} />
+                    </Tooltip>
+                  }
+                  rightSectionPointerEvents='auto'
+                  onKeyDown={onSearchKeyDown}
+                />
+              </Tooltip>
 
-              <Grid.Col span={3}>
-                <Button type='submit'>
-                  <IconSearch size={16} />
-                </Button>
-              </Grid.Col>
-            </Grid>
+              <Button type='submit'>
+                <IconSearch size={16} />
+              </Button>
+            </Flex>
           </form>
         }
 
@@ -343,7 +339,7 @@ export default function PaginationTable(props: IProps) {
         </Table.Tbody>
       </Table>
 
-      <Flex justify={!props.search ? 'center' : 'flex-end'} mx={8} mb={16}>
+      <Flex justify={!props.search ? 'center' : 'flex-end'}>
         {getPagination()}
       </Flex>
     </>

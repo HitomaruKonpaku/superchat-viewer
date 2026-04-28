@@ -28,8 +28,8 @@ export default function ChannelListPage() {
             <Center>
               <ChannelImage
                 src={element.thumbnail_url}
-                w={100}
-                h={100}
+                w={{ base: 64, md: 100 }}
+                h={{ base: 64, md: 100 }}
               />
             </Center>
           </Anchor>
@@ -111,7 +111,7 @@ export default function ChannelListPage() {
         thead={
           <Table.Tr>
             <Table.Th w={0} ta='center'>#</Table.Th>
-            <Table.Th w={100} />
+            <Table.Th w={{ base: 64, md: 100 }} />
             <Table.Th />
           </Table.Tr>
         }

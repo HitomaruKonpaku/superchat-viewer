@@ -147,7 +147,7 @@ export default function VideoPage() {
 
   return (
     <>
-      <Group gap={8} mx={8} mt={8}>
+      <Group gap={8}>
         <BackButton url={backUrl} />
         <YoutubeVideoButton id={id} />
         {video?.is_members_only && <Tooltip label='Members only'><IconStarFilled color='lime' size={16} /></Tooltip>}

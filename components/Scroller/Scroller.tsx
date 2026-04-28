@@ -18,8 +18,14 @@ export function Scroller() {
       pos='fixed'
       bottom={64}
       right={16}
-      opacity={0.8}
-      style={{ zIndex: 10 }}
+      opacity={0.6}
+      style={{
+        zIndex: 10,
+        transition: '0.3s',
+        '&:hover': {
+          opacity: 1,
+        },
+      }}
     >
       <ActionIcon variant='light' size='xl' radius='xl' onClick={onClickTop}>
         <IconArrowUp />
