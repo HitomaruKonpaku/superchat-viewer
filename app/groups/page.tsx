@@ -1,6 +1,7 @@
 'use client'
 
-import { Accordion, Anchor, Badge, Card, Flex, Group, SimpleGrid, Stack, Text } from '@mantine/core'
+import { Accordion, Anchor, Badge, Button, Card, Flex, Group, SimpleGrid, Stack, Text, Tooltip } from '@mantine/core'
+import { IconLayoutNavbarCollapse, IconLayoutNavbarExpand } from '@tabler/icons-react'
 import React, { useEffect, useState } from 'react'
 import { IconBoolean } from '../../components/icon/IconBoolean'
 import { ChannelImage } from '../../components/Image/ChannelImage'
@@ -8,6 +9,7 @@ import { api } from '../../src/api'
 
 export default function GroupListPage() {
   const [groups, setGroups] = useState<any[]>([])
+  const [values, setValues] = useState<string[]>([])
 
   useEffect(() => {
     async function load() {
@@ -26,6 +28,13 @@ export default function GroupListPage() {
     } catch (error: any) {
       console.warn(error.message)
     }
+  }
+
+  const allValues = groups.map((group) => group.name)
+  const isAllExpanded = values.length > 0 && values.length === allValues.length
+
+  const toggleAll = () => {
+    setValues(isAllExpanded ? [] : allValues)
   }
 
   const renderGroupControl = (group: any) => (
@@ -109,20 +118,37 @@ export default function GroupListPage() {
   )
 
   return (
-    <Accordion
-      multiple
-      variant='separated'
-      chevronPosition='right'
-      chevronIconSize={24}
-    >
-      {groups.map((group, i) => {
-        return (
-          <Accordion.Item key={i} value={group.name}>
-            {renderGroupControl(group)}
-            {renderGroupPanel(group)}
-          </Accordion.Item>
-        )
-      })}
-    </Accordion>
+    <Stack gap='sm'>
+      <Group justify='flex-end'>
+        <Button
+          disabled={!groups.length}
+          onClick={toggleAll}
+        >
+          {
+            isAllExpanded
+              ? <Tooltip label='Collapse'><IconLayoutNavbarCollapse /></Tooltip>
+              : <Tooltip label='Expand'><IconLayoutNavbarExpand /></Tooltip>
+          }
+        </Button>
+      </Group>
+
+      <Accordion
+        multiple
+        variant='separated'
+        chevronPosition='right'
+        chevronIconSize={24}
+        value={values}
+        onChange={setValues}
+      >
+        {groups.map((group, i) => {
+          return (
+            <Accordion.Item key={i} value={group.name}>
+              {renderGroupControl(group)}
+              {renderGroupPanel(group)}
+            </Accordion.Item>
+          )
+        })}
+      </Accordion>
+    </Stack >
   )
 }
