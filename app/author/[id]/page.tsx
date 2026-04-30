@@ -169,7 +169,7 @@ export default function AuthorPage() {
                     <Menu.Divider />
                     <MenuItemCopy value={element.channel_id} label='Copy ID' />
                     {element.channel_custom_url && <MenuItemCopy value={element.channel_custom_url} label='Copy handle' />}
-                    <MenuItemCopy value={element.channel_name} label='Copy name' />
+                    {element.channel_name && <MenuItemCopy value={element.channel_name} label='Copy name' />}
                   </Menu.Dropdown>
                 </Menu>
 

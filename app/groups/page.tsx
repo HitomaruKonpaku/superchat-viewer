@@ -1,15 +1,27 @@
 'use client'
 
-import { Accordion, Anchor, Badge, Button, Card, Flex, Group, SimpleGrid, Stack, Text, Tooltip } from '@mantine/core'
-import { IconLayoutNavbarCollapse, IconLayoutNavbarExpand } from '@tabler/icons-react'
-import React, { useEffect, useState } from 'react'
+import { Accordion, ActionIcon, Anchor, Badge, Button, Card, Flex, Group, Menu, SimpleGrid, Stack, Text, Tooltip } from '@mantine/core'
+import { useScrollIntoView } from '@mantine/hooks'
+import { IconDotsVertical, IconLayoutNavbarCollapse, IconLayoutNavbarExpand } from '@tabler/icons-react'
+import React, { useEffect, useRef, useState } from 'react'
 import { IconBoolean } from '../../components/icon/IconBoolean'
 import { ChannelImage } from '../../components/Image/ChannelImage'
+import MenuItemAppAuthorChat from '../../components/menu-item/MenuItemAppAuthorChat'
+import MenuItemAppChannel from '../../components/menu-item/MenuItemAppChannel'
+import MenuItemCopy from '../../components/menu-item/MenuItemCopy'
+import MenuItemHolodexChannel from '../../components/menu-item/MenuItemHolodexChannel'
+import MenuItemYoutubeChannel from '../../components/menu-item/MenuItemYoutubeChannel'
 import { api } from '../../src/api'
 
 export default function GroupListPage() {
   const [groups, setGroups] = useState<any[]>([])
   const [values, setValues] = useState<string[]>([])
+  const controlRefs = useRef<Record<string, HTMLButtonElement | null>>({})
+  const { scrollIntoView, targetRef } = useScrollIntoView<HTMLButtonElement>({
+    duration: 250,
+    axis: 'y',
+    offset: 48,
+  })
 
   useEffect(() => {
     async function load() {
@@ -18,6 +30,16 @@ export default function GroupListPage() {
 
     load()
   }, [])
+
+  useEffect(() => {
+    if (!targetRef.current) {
+      return
+    }
+
+    setTimeout(() => {
+      scrollIntoView({ alignment: 'start' })
+    }, 300)
+  }, [targetRef.current])
 
   async function initData() {
     const url = 'groups'
@@ -37,8 +59,28 @@ export default function GroupListPage() {
     setValues(isAllExpanded ? [] : allValues)
   }
 
+  const onAccordionChange = (nextValues: string[]) => {
+    const closedValues = values.filter((v) => !nextValues.includes(v))
+    setValues(nextValues)
+
+    const closedValue = closedValues[0]
+    if (!closedValue) {
+      return
+    }
+
+    const el = controlRefs.current[closedValue]
+    if (!el) {
+      return
+    }
+
+    targetRef.current = el
+  }
+
   const renderGroupControl = (group: any) => (
     <Accordion.Control
+      ref={(node) => {
+        controlRefs.current[group.name] = node
+      }}
       style={{
         position: 'sticky',
         top: 'var(--app-shell-header-height)',
@@ -75,7 +117,7 @@ export default function GroupListPage() {
       p='sm'
       style={{ height: '100%' }}
     >
-      <Flex gap='sm' align='center'>
+      <Flex gap={8} align='center'>
         <ChannelImage
           src={channel.thumbnail_url}
           w={48}
@@ -83,20 +125,50 @@ export default function GroupListPage() {
           loading='lazy'
         />
 
-        <Stack gap={2} style={{ flex: 1 }}>
-          <Flex gap={6} align='center'>
-            <IconBoolean value={channel.is_active} size={16} />
-            <Anchor underline='never' href={`/channel/${channel.id}`} target='_blank' flex={1}>
-              <Text span>{channel.custom_url}</Text>
-            </Anchor>
-          </Flex>
-
-          <Anchor underline='never' href={`/channel/${channel.id}`} target='_blank'>
-            <Text span>{channel.name}</Text>
-          </Anchor>
+        <Stack gap={6} visibleFrom='sm'>
+          <IconBoolean value={channel.is_active} size={20} nullable />
+          <IconBoolean value={channel.has_membership} size={20} nullable />
         </Stack>
+
+        <Anchor underline='never' href={`/channel/${channel.id}`} target='_blank' flex={1}>
+          <Stack gap={2} ta='justify'>
+            <Flex gap={2}>
+              <Flex gap={2} align='center' hiddenFrom='sm'>
+                <IconBoolean value={channel.is_active} size={16} nullable />
+                <IconBoolean value={channel.has_membership} size={16} nullable />
+              </Flex>
+              <Text span>{channel.custom_url}</Text>
+            </Flex>
+
+            <Text span>{channel.name}</Text>
+          </Stack>
+        </Anchor>
+
+        <Menu >
+          <Menu.Target>
+            <ActionIcon
+              variant='subtle'
+              h={'100%'}
+            >
+              <IconDotsVertical />
+            </ActionIcon>
+          </Menu.Target>
+
+          <Menu.Dropdown>
+            <MenuItemYoutubeChannel id={channel.id} />
+            <MenuItemHolodexChannel id={channel.id} />
+            <Menu.Divider />
+            <MenuItemAppChannel id={channel.id} />
+            <MenuItemAppAuthorChat id={channel.id} />
+            <Menu.Divider />
+            <MenuItemCopy value={channel.id} label='Copy ID' />
+            {channel.custom_url && <MenuItemCopy value={channel.custom_url} label='Copy handle' />}
+            {channel.name && <MenuItemCopy value={channel.name} label='Copy name' />}
+          </Menu.Dropdown>
+        </Menu>
+
       </Flex>
-    </Card>
+    </Card >
   )
 
   const renderGroupPanel = (group: any) => (
@@ -138,7 +210,7 @@ export default function GroupListPage() {
         chevronPosition='right'
         chevronIconSize={24}
         value={values}
-        onChange={setValues}
+        onChange={onAccordionChange}
       >
         {groups.map((group, i) => {
           return (
@@ -149,6 +221,6 @@ export default function GroupListPage() {
           )
         })}
       </Accordion>
-    </Stack >
+    </Stack>
   )
 }

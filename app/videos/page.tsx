@@ -125,7 +125,7 @@ export default function VideoListPage() {
         thead={
           <Table.Tr>
             <Table.Th w={0} ta='center'>#</Table.Th>
-            <Table.Th w={120} />
+            <Table.Th w={{ base: 100, sm: 120, md: 160 }} />
             <Table.Th />
           </Table.Tr>
         }

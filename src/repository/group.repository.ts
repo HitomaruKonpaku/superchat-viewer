@@ -29,6 +29,7 @@ SELECT ggc.name,
       json_build_object(
         'id', yc.id,
         'is_active', up.is_active,
+        'has_membership', up.has_membership,
         'custom_url', yc.custom_url,
         'name', yc.name,
         'thumbnail_url', yc.thumbnail_url

@@ -28,8 +28,8 @@ export default function ChannelListPage() {
             <Center>
               <ChannelImage
                 src={element.thumbnail_url}
-                w={{ base: 64, md: 100 }}
-                h={{ base: 64, md: 100 }}
+                w='100%'
+                h='100%'
               />
             </Center>
           </Anchor>
@@ -64,7 +64,7 @@ export default function ChannelListPage() {
                 <Menu.Divider />
                 <MenuItemCopy value={element.id} label='Copy ID' />
                 {element.custom_url && <MenuItemCopy value={element.custom_url} label='Copy handle' />}
-                <MenuItemCopy value={element.name} label='Copy name' />
+                {element.name && <MenuItemCopy value={element.name} label='Copy name' />}
               </Menu.Dropdown>
             </Menu>
 
@@ -111,7 +111,7 @@ export default function ChannelListPage() {
         thead={
           <Table.Tr>
             <Table.Th w={0} ta='center'>#</Table.Th>
-            <Table.Th w={{ base: 64, md: 100 }} />
+            <Table.Th w={{ base: 64, sm: 100, md: 120 }} />
             <Table.Th />
           </Table.Tr>
         }

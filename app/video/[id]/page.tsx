@@ -140,7 +140,7 @@ export default function VideoPage() {
                       <MenuItemAppAuthorChat id={element.author_channel_id} />
                       <Menu.Divider />
                       <MenuItemCopy value={element.author_channel_id} label='Copy ID' />
-                      <MenuItemCopy value={element.author_name} label='Copy name' />
+                      {element.name && <MenuItemCopy value={element.author_name} label='Copy name' />}
                     </Menu.Dropdown>
                   </Menu>
                 </Flex>
