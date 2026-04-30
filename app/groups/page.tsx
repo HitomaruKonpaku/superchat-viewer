@@ -32,7 +32,7 @@ export default function GroupListPage() {
     <Accordion.Control
       style={{
         position: 'sticky',
-        top: 0,
+        top: 'var(--app-shell-header-height)',
         zIndex: 1,
         backgroundColor: 'inherit',
       }}
