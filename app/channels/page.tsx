@@ -111,7 +111,7 @@ export default function ChannelListPage() {
         thead={
           <Table.Tr>
             <Table.Th w={0} ta='center'>#</Table.Th>
-            <Table.Th w={{ base: 64, sm: 100, md: 120 }} />
+            <Table.Th w={{ base: 64, sm: 100, md: 120 }} maw={120} />
             <Table.Th />
           </Table.Tr>
         }

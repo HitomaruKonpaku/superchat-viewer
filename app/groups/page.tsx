@@ -2,7 +2,7 @@
 
 import { Accordion, ActionIcon, Anchor, Badge, Button, Card, Flex, Group, Menu, SimpleGrid, Stack, Text, Tooltip } from '@mantine/core'
 import { useScrollIntoView } from '@mantine/hooks'
-import { IconDotsVertical, IconLayoutNavbarCollapse, IconLayoutNavbarExpand } from '@tabler/icons-react'
+import { IconChevronDown, IconDotsVertical } from '@tabler/icons-react'
 import React, { useEffect, useRef, useState } from 'react'
 import { IconBoolean } from '../../components/icon/IconBoolean'
 import { ChannelImage } from '../../components/Image/ChannelImage'
@@ -144,7 +144,7 @@ export default function GroupListPage() {
           </Stack>
         </Anchor>
 
-        <Menu >
+        <Menu>
           <Menu.Target>
             <ActionIcon
               variant='subtle'
@@ -166,9 +166,8 @@ export default function GroupListPage() {
             {channel.name && <MenuItemCopy value={channel.name} label='Copy name' />}
           </Menu.Dropdown>
         </Menu>
-
       </Flex>
-    </Card >
+    </Card>
   )
 
   const renderGroupPanel = (group: any) => (
@@ -192,16 +191,17 @@ export default function GroupListPage() {
   return (
     <Stack gap='sm'>
       <Group justify='flex-end'>
-        <Button
-          disabled={!groups.length}
-          onClick={toggleAll}
-        >
-          {
-            isAllExpanded
-              ? <Tooltip label='Collapse'><IconLayoutNavbarCollapse /></Tooltip>
-              : <Tooltip label='Expand'><IconLayoutNavbarExpand /></Tooltip>
-          }
-        </Button>
+        <Tooltip label={isAllExpanded ? 'Collapse' : 'Expand'}>
+          <Button
+            disabled={!groups.length}
+            onClick={toggleAll}
+          >
+            <IconChevronDown style={{
+              transform: isAllExpanded ? 'rotate(180deg)' : 'rotate(0)',
+              transition: '0.2s',
+            }} />
+          </Button>
+        </Tooltip>
       </Group>
 
       <Accordion
